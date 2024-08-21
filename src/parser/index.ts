@@ -1,10 +1,9 @@
+import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
-
-import { KeywordType, OperatorType, SymbolType, Token, TokenType } from "@/lexer/types";
-
-import { OperationType } from "./types";
+import { OperationType, QueryToken } from './types';
 
 let _tokens: Token[] = [];
+let _queryTokens: QueryToken[] = [];
 let _consumedTokens: Token[] = [];
 let _queries: string[] = [];
 //let _secondaryParsingTokens: Token[];
@@ -85,7 +84,6 @@ function handleKeyword(operator: Token, keyword: Token) {
     const simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
 
     if (keyword.Value === KeywordType.ID) {
-
         if (simpleComparatorType === OperationType.EQUALS) {
             query += `#${valueToken.Value}`;
         } else if (simpleComparatorType === OperationType.NOT_EQUALS) {
@@ -96,7 +94,6 @@ function handleKeyword(operator: Token, keyword: Token) {
         } else if (simpleComparatorType === OperationType.NOT_LIKE) {
             query += `:not([id*="${valueToken.Value}"])`;
         }
-
     } else if (keyword.Value === KeywordType.CLASS) {
         if (simpleComparatorType === OperationType.EQUALS) {
             query += `.${valueToken.Value}`;
@@ -127,7 +124,8 @@ function handleKeyword(operator: Token, keyword: Token) {
         } else if (simpleComparatorType === OperationType.NOT_CONTAINS) {
             query += `:not([style~="${valueToken.Value}"])`;
         }
-    } else if (keyword.Value === KeywordType.ATTRIBUTE) { // Attribute = 'data-color' AND Attribute.Value = 'red' AND Attribute('data-color') = 'red'
+    } else if (keyword.Value === KeywordType.ATTRIBUTE) {
+        // Attribute = 'data-color' AND Attribute.Value = 'red' AND Attribute('data-color') = 'red'
         if (simpleComparatorType === OperationType.EQUALS) {
             query += `[${valueToken.Value}]`;
         } else if (simpleComparatorType === OperationType.NOT_EQUALS) {
@@ -143,7 +141,7 @@ function handleKeyword(operator: Token, keyword: Token) {
             query += `:not([style~="${valueToken.Value}"])`;
         }
     }
-    
+
     _queries.push(query);
 }
 
@@ -167,7 +165,7 @@ function handleFunction(operator: Token, directive: Token) {
         if (!directive.Arguments || directive.Arguments.length < 1) {
             throw new Error('Invalid arguments. Expected one argument, but got none.');
         }
-        
+
         const valueToken = consumeToken(TokenType.STRING);
         const simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
         const attributeName = directive.Arguments[0];
@@ -188,22 +186,20 @@ function handleFunction(operator: Token, directive: Token) {
     _queries.push(query);
 }
 
-// TODO: Add scopes & grouping based on `(` & `)`
-
 function parser(tokens: Token[]): String {
     _tokens = [...tokens];
-    
+
     consumeToken(TokenType.KEYWORD); // SELECT
-    consumeToken(TokenType.OPERATOR) // *
-    consumeToken(TokenType.KEYWORD) // FROM
-    consumeToken(TokenType.IDENTIFIER) // Dom
-    consumeToken(TokenType.KEYWORD) // WHERE
-    
+    consumeToken(TokenType.OPERATOR); // *
+    consumeToken(TokenType.KEYWORD); // FROM
+    consumeToken(TokenType.IDENTIFIER); // Dom
+    consumeToken(TokenType.KEYWORD); // WHERE
+
     let hasFirstQueryBeenConsumed = false;
 
     while (_tokens.length > 0) {
         let operator: Token | null;
-        
+
         if (hasFirstQueryBeenConsumed) {
             operator = consumeToken(TokenType.OPERATOR);
         } else {
@@ -213,10 +209,10 @@ function parser(tokens: Token[]): String {
 
         const token = consumeToken(TokenType.KEYWORD, [TokenType.FUNCTION]);
 
-        if (token.Type === TokenType.KEYWORD){
+        if (token.Type === TokenType.KEYWORD) {
             handleKeyword(operator, token);
         } else if (token.Type === TokenType.FUNCTION) {
-            handleFunction(operator, token)
+            handleFunction(operator, token);
         }
     }
 

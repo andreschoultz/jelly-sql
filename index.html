@@ -1,13 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jelly SQL</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/index.ts"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Jelly SQL</title>
+    </head>
+
+    <body>
+        <div id="app">
+            <!-- Test Compound Expression Selectors (Basic) -->
+            <div hidden>
+                <a href="https:\\www.jellysql.com" target="_blank"> HREF Only </a>
+
+                <a href="https:\\www.jellysql.com" onclick="someFunc('https:\\www.jellysql.com')"> HREF and OnClick </a>
+
+                <a onclick="someFunc('https:\\www.jellysql.com')"> OnClick Only </a>
+
+                <button href="https:\\www.jellysql.com" target="_blank">HREF Only</button>
+
+                <button href="https:\\www.jellysql.com" onclick="someFunc('https:\\www.jellysql.com')">HREF and OnClick</button>
+
+                <button onclick="someFunc('https:\\www.jellysql.com')">OnClick Only</button>
+            </div>
+        </div>
+        <script type="module" src="/src/index.ts"></script>
+    </body>
 </html>
