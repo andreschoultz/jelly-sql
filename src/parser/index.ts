@@ -1,4 +1,4 @@
-import { KeywordType, OperatorType, Token, TokenType } from '@/lexer/types';
+import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
@@ -150,7 +150,19 @@ function getAttributeSelector(keyword: Token, simpleComparatorType: OperationTyp
             break;
         case OperationType.LIKE:
         case OperationType.NOT_LIKE:
-            selector = '*=';
+            const hasStart = valueToken.Value.startsWith(SymbolType.PERCENT);
+            const hasEnd = valueToken.Value.endsWith(SymbolType.PERCENT);
+
+            if (hasStart && !hasEnd) {
+                selector = '^=';
+            } else if (!hasStart && hasEnd) {
+                selector = '$=';
+            } else {
+                selector = '*=';
+            }
+
+            valueToken.Value = valueToken.Value.slice(hasStart ? 1 : 0, hasEnd ? valueToken.Value.length - 1 : undefined);
+
             break;
         case OperationType.CONTAINS:
         case OperationType.NOT_CONTAINS:

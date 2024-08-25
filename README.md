@@ -31,6 +31,16 @@ Please see [Local Development](#Local-Development) for working with the source.
 
 > TODO
 
+### TODO
+
+- ~~(***Active***) Extend attribute substring selectors~~
+- Implement `:not()`
+- Force tag selectors to front of query
+- Implement combinators, ex. ` `, `>`, `+`, `~`
+- Implement pseudo selectors
+- Improve type checking & syntax errors
+- Support escaping characters?
+
 ## Local Development
 
 > `npm run-script <keyword>`

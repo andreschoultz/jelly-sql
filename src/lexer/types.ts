@@ -62,6 +62,8 @@ enum SymbolType {
     TIMES = '*',
     DIVIDE = '/',
 
+    PERCENT = '%',
+
     ASSIGN = '=',
     AND = '&&',
     OR = '||',
