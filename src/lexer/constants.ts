@@ -1,4 +1,4 @@
-import { FunctionType, KeywordType, OperatorType, SymbolType, TokenType } from "./types";
+import { FunctionType, KeywordType, OperatorType, SymbolType, TokenType } from './types';
 
 /** ------ Lookup Lists ------ */
 

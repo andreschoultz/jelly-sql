@@ -1,13 +1,13 @@
 body {
     background-color: #222;
     color: #fff;
-    margin: 0;
     font-family: Arial, sans-serif;
+    margin: 0;
 }
 
 .content-wrapper {
-    height: 100vh;
     align-items: center;
+    height: 100vh;
 }
 
 .row {
@@ -19,9 +19,9 @@ body {
 
 .column {
     display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
     flex: 1;
+    flex-basis: 100%;
+    flex-direction: column;
 }
 
 .align-center {
