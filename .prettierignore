@@ -4,3 +4,11 @@
 coverage
 dist
 node_modules
+.lintstagedrc
+.prettierrc
+.stylelintrc
+package-lock.json
+package.json
+*.md
+tsc.config.json
+*.html

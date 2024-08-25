@@ -38,7 +38,7 @@ enum OperatorType {
 
 enum FunctionType {
     ATTRIBUTE = 'ATTRIBUTE',
-    TAG = 'TAG'
+    TAG = 'TAG',
 }
 
 enum CompoundType {

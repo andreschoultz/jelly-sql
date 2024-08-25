@@ -1,5 +1,5 @@
-import { functions, keywords, operators, Regex } from "./constants";
-import { Token, TokenType } from "./types";
+import { functions, keywords, operators, Regex } from './constants';
+import { Token, TokenType } from './types';
 
 function cleanToken(value: string): string {
     if (value.startsWith("'")) value = value.substring(1);
@@ -84,10 +84,10 @@ function lexer(input: string): Token[] {
                     Value: functionName,
                     Arguments: tokenizeArguments($function),
                 });
-            }
 
-            seekPosition += matchValue.length;
-            continue;
+                seekPosition += matchValue.length;
+                continue;
+            }
         }
 
         /* ------ Operators ------ */
