@@ -1,6 +1,6 @@
 import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
-import { CompoundExpression, Expression, QueryToken } from './types';
+import { CompoundExpression, Expression, JoiningOperatorType, QueryToken } from './types';
 
 let _tokens: Token[] = [];
 
@@ -20,7 +20,7 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
 
     let cutIdx = _tokens.findIndex(x => x.Type === TokenType.KEYWORD && x.Value === KeywordType.WHERE);
 
-    if (cutIdx + 1 < _tokens.length) return [];
+    if (cutIdx + 1 > _tokens.length) return [];
 
     _tokens = _tokens.slice(cutIdx + 1);
 
@@ -51,11 +51,14 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
                 if (token.Value == SymbolType.LPAREN && compoundExpression == null) {
                     compoundExpression = {
                         Expressions: [],
-                        JoiningOperator: (operator?.Value as OperatorType.AND | OperatorType.OR) ?? OperatorType.AND,
+                        JoiningOperator: (operator?.Value as JoiningOperatorType) ?? OperatorType.AND,
                     };
                 } else if (token.Value === SymbolType.RPAREN && compoundExpression && expression) {
                     compoundExpression.Expressions.push(expression);
-                    queryTokens.push({ CompoundExpression: compoundExpression });
+                    queryTokens.push({
+                        Expressions: compoundExpression.Expressions,
+                        JoiningOperator: compoundExpression.JoiningOperator,
+                    });
 
                     expression = null;
                     compoundExpression = null;
@@ -63,15 +66,17 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
             } else if (token?.Value == OperatorType.AND || token?.Value == OperatorType.OR) {
                 if (expression) {
                     if (compoundExpression) {
+                        if (compoundExpression.Expressions.length === 0) {
+                            expression.JoiningOperator = OperatorType.AND; // Force it, otherwise it can be the the operator before the braces, which can be a 'OR'
+                        }
+
                         compoundExpression.Expressions.push(expression);
 
-                        expression = {
-                            Tokens: [],
-                            JoiningOperator: (token?.Value as OperatorType.AND | OperatorType.OR) ?? OperatorType.AND,
-                        };
+                        expression = new Expression([], (token?.Value as JoiningOperatorType) ?? OperatorType.AND);
                     } else {
                         queryTokens.push({
-                            Expression: expression,
+                            Expressions: [expression],
+                            JoiningOperator: OperatorType.AND,
                         });
 
                         expression = null;
@@ -83,10 +88,7 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
             } else if (expression) {
                 expression.Tokens.push(token);
             } else {
-                expression = {
-                    Tokens: [token],
-                    JoiningOperator: (operator?.Value as OperatorType.AND | OperatorType.OR) ?? OperatorType.AND,
-                };
+                expression = new Expression([token], (operator?.Value as JoiningOperatorType) ?? OperatorType.AND);
             }
         }
 
@@ -95,19 +97,22 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
             const previousQueryToken = queryTokensCnt > 0 ? queryTokens[queryTokensCnt - 1] : null;
 
             /* When a `OR` is next to a `AND`, make the two a compound */
-            if (previousQueryToken?.Expression?.JoiningOperator == OperatorType.AND && expression.JoiningOperator == OperatorType.OR) {
+            if (
+                previousQueryToken?.Expressions.length == 1 &&
+                previousQueryToken?.Expressions?.[0].JoiningOperator == OperatorType.AND &&
+                expression.JoiningOperator == OperatorType.OR
+            ) {
                 // Previous wasn't a compoundQuery && remainder of `if` statement is true
                 queryTokens.pop();
 
                 queryTokens.push({
-                    CompoundExpression: {
-                        JoiningOperator: OperatorType.AND,
-                        Expressions: [previousQueryToken.Expression, expression],
-                    },
+                    JoiningOperator: OperatorType.AND,
+                    Expressions: [...previousQueryToken.Expressions, expression],
                 });
             } else {
                 queryTokens.push({
-                    Expression: expression,
+                    Expressions: [expression],
+                    JoiningOperator: OperatorType.AND,
                 });
             }
 

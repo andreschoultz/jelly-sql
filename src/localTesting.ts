@@ -1,5 +1,5 @@
 import { lexer } from './lexer';
-import { buildExpressions } from './parser/expressionBuilder';
+import { parser } from './parser';
 
 /** Html element selectors
  *
@@ -162,14 +162,12 @@ const sqlDomQuery = `SELECT * FROM Dom WHERE
 const lexerTokens = lexer(sqlDomQuery);
 console.log(lexerTokens);
 
-const queryTokens = buildExpressions(lexerTokens);
-console.log('Query Tokens: ', queryTokens);
-
-// const querySelector = parser(lexerTokens);
-// console.log(querySelector);
+const querySelector = parser(lexerTokens);
+console.log(querySelector);
 
 //manualQuerySelectorChecks();
 
+// @ts-ignore
 function manualQuerySelectorChecks() {
     const querySelectors = [
         'a[href*="jellysql.com"], a[onclick*="jellysql.com"]',
