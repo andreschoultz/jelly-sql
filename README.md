@@ -34,11 +34,13 @@ Please see [Local Development](#Local-Development) for working with the source.
 ### TODO
 
 - ~~(***Active***) Extend attribute substring selectors~~
-- Implement `:not()`
+- ~~Implement `:not()`~~
 - Force tag selectors to front of query
+- Resolve seelctors duplicating with multiple un-grouped `OR` operators
 - Implement combinators, ex. ` `, `>`, `+`, `~`
 - Implement pseudo selectors
 - Improve type checking & syntax errors
+- Unit testing
 - Support escaping characters?
 
 ## Local Development

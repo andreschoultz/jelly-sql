@@ -154,9 +154,9 @@ import { parser } from './parser';
     AND Attribute('data-color') = 'red'
  */
 
-const sqlDomQuery = `SELECT * FROM Dom WHERE
-  Tag = 'a'
-  AND (Attribute('href') LIKE 'jellysql.com' OR Attribute('onclick') LIKE 'jellysql.com')
+const sqlDomQuery = `SELECT * FROM DOM WHERE
+    Tag = 'a' AND  Attribute('href') LIKE 'jellysql.com'
+ OR Tag = 'button' AND Attribute('onclick') LIKE 'jellysql.com'
 `;
 
 const lexerTokens = lexer(sqlDomQuery);
@@ -169,16 +169,17 @@ console.log(querySelector);
 
 // @ts-ignore
 function manualQuerySelectorChecks() {
-    const querySelectors = [
-        'a[href*="jellysql.com"], a[onclick*="jellysql.com"]',
-        'a[href*="jellysql.com"][onclick*="jellysql.com"]',
-        'a[href*="jellysql.com"][onclick*="jellysql.com"], button[href*="jellysql.com"][onclick*="jellysql.com"]',
-        'a[href*="jellysql.com"] a[onclick*="jellysql.com"]',
-    ];
+  const querySelectors = [
+    '[id*="btn"]:not([id*="btn-confirm"])#a-confirm:not(#modal-delete-user).search-icon[class*="-primary"][class~="btn-primary"]:not([class~="btn-small"])[data-color="red"]',
+    'a[href*="jellysql.com"], a[onclick*="jellysql.com"]',
+    'a[href*="jellysql.com"][onclick*="jellysql.com"]',
+    'a[href*="jellysql.com"][onclick*="jellysql.com"], button[href*="jellysql.com"][onclick*="jellysql.com"]',
+    'a[href*="jellysql.com"] a[onclick*="jellysql.com"]',
+  ];
 
-    for (let i = 0; i < querySelectors.length; i++) {
-        const jsElements = document.querySelectorAll(querySelectors[i]);
+  for (let i = 0; i < querySelectors.length; i++) {
+    const jsElements = document.querySelectorAll(querySelectors[i]);
 
-        console.log(`${querySelectors[i]}: `, jsElements);
-    }
+    console.log(`${querySelectors[i]}: `, jsElements);
+  }
 }
