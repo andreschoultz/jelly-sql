@@ -1,5 +1,6 @@
 import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
+import { keywordPriority } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
 import { deepCopy, getAttributeName, getSimpleOperationType } from './utilities';
@@ -54,6 +55,16 @@ function groupSelectors(queryTokens: QueryToken[]): SelectorGroup[] {
                 Selectors: [...(lastGrouping?.Selectors ?? []), ...queryGroupings[j].Selectors],
             });
         }
+    }
+
+    for (let i = 0; i < groupings.length; i++) {
+        groupings[i].Selectors = groupings[i].Selectors.sort((a, b) => {
+            if (keywordPriority[a.KeywordType] && keywordPriority[b.KeywordType]) {
+                return keywordPriority[a.KeywordType] - keywordPriority[b.KeywordType];
+            }
+
+            return 0;
+        });
     }
 
     return groupings;

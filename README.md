@@ -35,9 +35,9 @@ Please see [Local Development](#Local-Development) for working with the source.
 
 - ~~ Extend attribute substring selectors~~
 - ~~Implement `:not()`~~
-- (***Next***) Force tag selectors to front of query
-- ~~(***Active***) Resolve seelctors duplicating with multiple un-grouped `OR` operators~~
-- Implement combinators, ex. ` `, `>`, `+`, `~`
+- ~~(***Active***) Force tag selectors to front of query~~
+- ~~Resolve selectors duplicating with multiple un-grouped `OR` operators~~
+- (***Next***)Implement combinators, ex. ` `, `>`, `+`, `~`
 - Implement pseudo selectors
 - Improve type checking & syntax errors
 - Unit testing
