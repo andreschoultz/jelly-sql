@@ -1,18 +1,6 @@
-import {
-  KeywordType,
-  OperatorType,
-  SymbolType,
-  Token,
-  TokenType,
-} from '@/lexer/types';
+import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
-import {
-  CompoundExpression,
-  Expression,
-  JoiningOperatorType,
-  QueryToken,
-} from './types';
-import { deepCopy } from './utilities';
+import { CompoundExpression, Expression, JoiningOperatorType, QueryToken } from './types';
 
 let _tokens: Token[] = [];
 
@@ -28,142 +16,137 @@ let _tokens: Token[] = [];
  * @returns An array of query tokens representing the parsed expressions.
  */
 function buildExpressions(tokens: Token[]): QueryToken[] {
-  _tokens = [...tokens];
+    _tokens = [...tokens];
 
-  let cutIdx = _tokens.findIndex(
-    (x) => x.Type === TokenType.KEYWORD && x.Value === KeywordType.WHERE,
-  );
+    let cutIdx = _tokens.findIndex(x => x.Type === TokenType.KEYWORD && x.Value === KeywordType.WHERE);
 
-  if (cutIdx + 1 > _tokens.length) return [];
+    if (cutIdx + 1 > _tokens.length) return [];
 
-  _tokens = _tokens.slice(cutIdx + 1);
+    _tokens = _tokens.slice(cutIdx + 1);
 
-  let hasFirstQueryBeenConsumed = false;
-  let compoundExpression: CompoundExpression | null = null;
-  let expression: Expression | null = null;
-  let queryTokens: QueryToken[] = [];
-  let checkExpressionForCompound = false;
+    let hasFirstQueryBeenConsumed = false;
+    let isArtificialCompound = false;
+    let compoundExpression: CompoundExpression | null = null;
+    let expression: Expression | null = null;
+    let queryTokens: QueryToken[] = [];
 
-  while (_tokens.length > 0) {
-    let operator: Token | null = null;
-    const currentQueryTokenCount = queryTokens.length;
+    while (_tokens.length > 0) {
+        let operator: Token | null = null;
+        const currentQueryTokenCount = queryTokens.length;
 
-    if (hasFirstQueryBeenConsumed) {
-      let _token = _tokens.shift();
+        if (hasFirstQueryBeenConsumed) {
+            let _token = _tokens.shift();
 
-      if (_token) operator = _token;
-    } else {
-      operator = { Type: TokenType.OPERATOR, Value: OperatorType.AND };
-      hasFirstQueryBeenConsumed = true;
-    }
+            if (_token) {
+                operator = _token;
+            }
+        } else {
+            operator = { Type: TokenType.OPERATOR, Value: OperatorType.AND };
 
-    while (queryTokens.length == currentQueryTokenCount && _tokens.length > 0) {
-      let token = _tokens.shift();
-
-      if (!token) continue;
-
-      if (token.Type === TokenType.SYMBOL) {
-        if (token.Value == SymbolType.LPAREN && compoundExpression == null) {
-          compoundExpression = {
-            Expressions: [],
-            JoiningOperator:
-              (operator?.Value as JoiningOperatorType) ?? OperatorType.AND,
-          };
-        } else if (
-          token.Value === SymbolType.RPAREN &&
-          compoundExpression &&
-          expression
-        ) {
-          compoundExpression.Expressions.push(expression);
-          queryTokens.push({
-            Expressions: compoundExpression.Expressions,
-            JoiningOperator: compoundExpression.JoiningOperator,
-          });
-
-          expression = null;
-          compoundExpression = null;
-        }
-      } else if (
-        token?.Value == OperatorType.AND ||
-        token?.Value == OperatorType.OR
-      ) {
-        if (expression) {
-          if (compoundExpression) {
-            if (compoundExpression.Expressions.length === 0) {
-              expression.JoiningOperator = OperatorType.AND; // Force it, otherwise it can be the the operator before the braces, which can be a 'OR'
+            /* Artificial Braces/Compound - Always start off with a compound */
+            if (_tokens[0].Value !== SymbolType.LPAREN) {
+                _tokens.unshift({
+                    Type: TokenType.SYMBOL,
+                    Value: SymbolType.LPAREN,
+                });
+                isArtificialCompound = true;
             }
 
-            compoundExpression.Expressions.push(expression);
-
-            expression = new Expression(
-              [],
-              (token?.Value as JoiningOperatorType) ?? OperatorType.AND,
-            );
-          } else {
-            queryTokens.push({
-              Expressions: [expression],
-              JoiningOperator: OperatorType.AND,
-            });
-
-            expression = null;
-            checkExpressionForCompound = true;
-            _tokens.unshift(token);
-          }
-        } else {
-          _tokens.unshift(token);
-        }
-      } else if (expression) {
-        expression.Tokens.push(token);
-      } else {
-        expression = new Expression(
-          [token],
-          (operator?.Value as JoiningOperatorType) ?? OperatorType.AND,
-        );
-      }
-    }
-
-    if (expression || checkExpressionForCompound) {
-      const queryTokensCnt = queryTokens.length;
-      let previousQueryToken =
-        queryTokensCnt > 0 ? queryTokens[queryTokensCnt - 1] : null;
-
-      if (!expression && checkExpressionForCompound && queryTokensCnt > 1) {
-        expression = deepCopy(previousQueryToken?.Expressions[0] as Expression);
-        previousQueryToken = deepCopy(queryTokens[queryTokensCnt - 2]);
-      }
-
-      /* When a `OR` is next to a `AND`, make the two a compound */
-      if (
-        previousQueryToken?.Expressions.length == 1 &&
-        previousQueryToken?.Expressions?.[0].JoiningOperator ==
-          OperatorType.AND &&
-        expression?.JoiningOperator == OperatorType.OR
-      ) {
-        // Previous wasn't a compoundQuery && remainder of `if` statement is true
-
-        if (checkExpressionForCompound) {
-          queryTokens.pop();
+            hasFirstQueryBeenConsumed = true;
         }
 
-        queryTokens.pop();
+        while (queryTokens.length == currentQueryTokenCount && _tokens.length > 0) {
+            let token = _tokens.shift();
 
-        queryTokens.push({
-          JoiningOperator: OperatorType.AND,
-          Expressions: [...previousQueryToken.Expressions, expression],
-        });
-      } else if (!checkExpressionForCompound) {
-        queryTokens.push({
-          Expressions: [expression as Expression],
-          JoiningOperator: OperatorType.AND,
-        });
-      }
+            if (!token) continue;
 
-      checkExpressionForCompound = false;
-      expression = null;
+            if (token.Type === TokenType.SYMBOL) {
+                if (token.Value == SymbolType.LPAREN && compoundExpression == null) {
+                    compoundExpression = {
+                        Expressions: [],
+                        JoiningOperator: (operator?.Value as JoiningOperatorType) ?? OperatorType.AND,
+                    };
+                } else if (token.Value === SymbolType.RPAREN && compoundExpression) {
+                    if (expression) {
+                        compoundExpression.Expressions.push(expression);
+                        expression = null;
+                    }
+
+                    queryTokens.push({
+                        Expressions: compoundExpression.Expressions,
+                        JoiningOperator: compoundExpression.JoiningOperator,
+                    });
+
+                    compoundExpression = null;
+
+                    /* Artificial Braces/Compound - Add brace for next compound */
+                    if (_tokens.length > 0 && _tokens[1].Value !== SymbolType.LPAREN) {
+                        _tokens.splice(1, 0, { Type: TokenType.SYMBOL, Value: SymbolType.LPAREN });
+                        isArtificialCompound = true;
+                    }
+                }
+            } else if (token?.Value == OperatorType.AND || token?.Value == OperatorType.OR) {
+                if (expression) {
+                    if (compoundExpression) {
+                        /* Artificial Braces/Compound - Close off the compound */
+                        if (isArtificialCompound && (token.Value === OperatorType.OR || _tokens[0].Value == SymbolType.LPAREN)) {
+                            if (token.Value === OperatorType.OR) {
+                                if (_tokens[0].Value != SymbolType.LPAREN) {
+                                    // Artificially add brace for next compound query
+                                    _tokens.unshift({
+                                        Type: TokenType.SYMBOL,
+                                        Value: SymbolType.LPAREN,
+                                    });
+                                } else {
+                                    isArtificialCompound = false;
+                                }
+                            } else {
+                                isArtificialCompound = false;
+                            }
+
+                            _tokens.unshift(token);
+
+                            _tokens.unshift({
+                                Type: TokenType.SYMBOL,
+                                Value: SymbolType.RPAREN,
+                            });
+                        } else {
+                            if (compoundExpression.Expressions.length === 0) {
+                                expression.JoiningOperator = OperatorType.AND; // Force it, otherwise it can be the the operator before the braces, which can be a 'OR'
+                            }
+
+                            compoundExpression.Expressions.push(expression);
+                            expression = new Expression([], (token?.Value as JoiningOperatorType) ?? OperatorType.AND);
+                        }
+                    } else {
+                        queryTokens.push({
+                            Expressions: [expression],
+                            JoiningOperator: OperatorType.AND,
+                        });
+
+                        expression = null;
+                        _tokens.unshift(token);
+                    }
+                } else {
+                    _tokens.unshift(token);
+                }
+            } else if (expression) {
+                expression.Tokens.push(token);
+            } else {
+                expression = new Expression([token], (operator?.Value as JoiningOperatorType) ?? OperatorType.AND);
+            }
+
+            /* Artificial Braces/Compound - Reached end of query, close it off */
+            if (_tokens.length === 0 && compoundExpression) {
+                _tokens.unshift({
+                    Type: TokenType.SYMBOL,
+                    Value: SymbolType.RPAREN,
+                });
+            }
+        }
     }
-  }
 
-  return queryTokens;
+    return queryTokens;
 }
 
 export { buildExpressions };

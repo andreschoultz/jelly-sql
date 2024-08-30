@@ -1,6 +1,3 @@
-import { lexer } from './lexer';
-import { parser } from './parser';
-
 /** Html element selectors
  *
  * - Tag
@@ -9,6 +6,9 @@ import { parser } from './parser';
  * - Class
  * - Style
  */
+
+import { lexer } from './lexer';
+import { parser } from './parser';
 
 /**HTML Elements
  *
@@ -155,31 +155,30 @@ import { parser } from './parser';
  */
 
 const sqlDomQuery = `SELECT * FROM DOM WHERE
-    Tag = 'a' AND  Attribute('href') LIKE 'jellysql.com'
- OR Tag = 'button' AND Attribute('onclick') LIKE 'jellysql.com'
-`;
+    (Tag = 'a' AND  Attribute('href') LIKE 'jellysql.com')
+ OR (Tag = 'button' AND Attribute('onclick') LIKE 'jellysql.com')`;
 
 const lexerTokens = lexer(sqlDomQuery);
-console.log(lexerTokens);
+console.log('Lexer Tokens: ', lexerTokens);
 
 const querySelector = parser(lexerTokens);
-console.log(querySelector);
+console.log('Query: ', querySelector);
 
 //manualQuerySelectorChecks();
 
 // @ts-ignore
 function manualQuerySelectorChecks() {
-  const querySelectors = [
-    '[id*="btn"]:not([id*="btn-confirm"])#a-confirm:not(#modal-delete-user).search-icon[class*="-primary"][class~="btn-primary"]:not([class~="btn-small"])[data-color="red"]',
-    'a[href*="jellysql.com"], a[onclick*="jellysql.com"]',
-    'a[href*="jellysql.com"][onclick*="jellysql.com"]',
-    'a[href*="jellysql.com"][onclick*="jellysql.com"], button[href*="jellysql.com"][onclick*="jellysql.com"]',
-    'a[href*="jellysql.com"] a[onclick*="jellysql.com"]',
-  ];
+    const querySelectors = [
+        '[id*="btn"]:not([id*="btn-confirm"])#a-confirm:not(#modal-delete-user).search-icon[class*="-primary"][class~="btn-primary"]:not([class~="btn-small"])[data-color="red"]',
+        'a[href*="jellysql.com"], a[onclick*="jellysql.com"]',
+        'a[href*="jellysql.com"][onclick*="jellysql.com"]',
+        'a[href*="jellysql.com"][onclick*="jellysql.com"], button[href*="jellysql.com"][onclick*="jellysql.com"]',
+        'a[href*="jellysql.com"] a[onclick*="jellysql.com"]',
+    ];
 
-  for (let i = 0; i < querySelectors.length; i++) {
-    const jsElements = document.querySelectorAll(querySelectors[i]);
+    for (let i = 0; i < querySelectors.length; i++) {
+        const jsElements = document.querySelectorAll(querySelectors[i]);
 
-    console.log(`${querySelectors[i]}: `, jsElements);
-  }
+        console.log(`${querySelectors[i]}: `, jsElements);
+    }
 }
