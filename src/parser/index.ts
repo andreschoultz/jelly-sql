@@ -1,20 +1,8 @@
-import {
-  KeywordType,
-  OperatorType,
-  SymbolType,
-  Token,
-  TokenType,
-} from '@/lexer/types';
+import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
 import { buildExpressions } from './expressionBuilder';
-import {
-  Expression,
-  OperationType,
-  QueryToken,
-  Selector,
-  SelectorGroup,
-} from './types';
-import { getAttributeName, getSimpleOperationType } from './utilities';
+import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
+import { deepCopy, getAttributeName, getSimpleOperationType } from './utilities';
 import { hasSecondaryOperator } from './validators';
 
 /**
@@ -26,24 +14,24 @@ import { hasSecondaryOperator } from './validators';
  * @returns An array of SelectorGroup objects, each representing a logical group of selectors.
  */
 function createSelectors(queryToken: QueryToken): SelectorGroup[] {
-  let selectors: Selector[] = [];
-  let groupings: SelectorGroup[] = [];
+    let selectors: Selector[] = [];
+    let groupings: SelectorGroup[] = [];
 
-  for (let i = 0; i < queryToken.Expressions.length; i++) {
-    const selector = createSelector(queryToken.Expressions[i]);
+    for (let i = 0; i < queryToken.Expressions.length; i++) {
+        const selector = createSelector(queryToken.Expressions[i]);
 
-    if (selector.JoiningOperator === OperatorType.AND) {
-      selectors.push(selector);
-    } else {
-      groupings.push({ Selectors: [selector] });
+        if (selector.JoiningOperator === OperatorType.AND) {
+            selectors.push(selector);
+        } else {
+            groupings.push({ Selectors: [selector] });
+        }
     }
-  }
 
-  if (selectors.length > 0) {
-    groupings.unshift({ Selectors: selectors });
-  }
+    if (selectors.length > 0) {
+        groupings.unshift({ Selectors: selectors });
+    }
 
-  return groupings;
+    return groupings;
 }
 
 /**
@@ -55,26 +43,20 @@ function createSelectors(queryToken: QueryToken): SelectorGroup[] {
  * @returns An array of SelectorGroup objects, where each group represents a logical combination of selectors.
  */
 function groupSelectors(queryTokens: QueryToken[]): SelectorGroup[] {
-  let groupings: SelectorGroup[] = [];
+    let groupings: SelectorGroup[] = [];
 
-  for (let i = 0; i < queryTokens.length; i++) {
-    const queryGroupings = createSelectors(queryTokens[i]);
-    const lastGrouping =
-      queryTokens[i].JoiningOperator === OperatorType.AND
-        ? groupings.pop()
-        : null;
+    for (let i = 0; i < queryTokens.length; i++) {
+        const queryGroupings = createSelectors(queryTokens[i]);
+        const lastGrouping = queryTokens[i].JoiningOperator === OperatorType.AND ? groupings.pop() : null;
 
-    for (let j = 0; j < queryGroupings.length; j++) {
-      groupings.push({
-        Selectors: [
-          ...(lastGrouping?.Selectors ?? []),
-          ...queryGroupings[j].Selectors,
-        ],
-      });
+        for (let j = 0; j < queryGroupings.length; j++) {
+            groupings.push({
+                Selectors: [...(lastGrouping?.Selectors ?? []), ...queryGroupings[j].Selectors],
+            });
+        }
     }
-  }
 
-  return groupings;
+    return groupings;
 }
 
 /**
@@ -86,19 +68,19 @@ function groupSelectors(queryTokens: QueryToken[]): SelectorGroup[] {
  * @returns A string representing the combined query built from the selector groups.
  */
 function generateQuery(groupings: SelectorGroup[]): string {
-  let query = '';
+    let query = '';
 
-  for (let i = 0; i < groupings.length; i++) {
-    let subQuery = '';
+    for (let i = 0; i < groupings.length; i++) {
+        let subQuery = '';
 
-    for (let j = 0; j < groupings[i].Selectors.length; j++) {
-      subQuery += groupings[i].Selectors[j].Value;
+        for (let j = 0; j < groupings[i].Selectors.length; j++) {
+            subQuery += groupings[i].Selectors[j].Value;
+        }
+
+        query += i === 0 ? subQuery : `, ${subQuery}`;
     }
 
-    query += i === 0 ? subQuery : `, ${subQuery}`;
-  }
-
-  return query;
+    return query;
 }
 
 /**
@@ -111,70 +93,40 @@ function generateQuery(groupings: SelectorGroup[]): string {
  * @returns A Selector object representing a single CSS-like selector.
  */
 function createSelector(expression: Expression): Selector {
-  console.log(expression);
-  const keyword = expression.consumeToken(TokenType.KEYWORD, [
-    TokenType.FUNCTION,
-  ]);
-  const comparator = expression.consumeToken(TokenType.OPERATOR, [
-    TokenType.IDENTIFIER,
-    TokenType.SYMBOL,
-  ]);
-  let secondaryOperator: Token | undefined;
+    const keyword = expression.consumeToken(TokenType.KEYWORD, [TokenType.FUNCTION]);
+    const comparator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER, TokenType.SYMBOL]);
+    let secondaryOperator: Token | undefined;
 
-  if (
-    expression.nextToken() &&
-    hasSecondaryOperator(comparator, expression.nextToken())
-  ) {
-    secondaryOperator = expression.consumeToken(TokenType.OPERATOR, [
-      TokenType.IDENTIFIER,
-    ]);
-  }
+    if (expression.nextToken() && hasSecondaryOperator(comparator, expression.nextToken())) {
+        secondaryOperator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER]);
+    }
 
-  const valueToken = expression.consumeToken(TokenType.STRING);
-  const simpleComparatorType = getSimpleOperationType(
-    comparator.Value,
-    secondaryOperator?.Value ?? null,
-  );
+    const valueToken = expression.consumeToken(TokenType.STRING);
+    const simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
 
-  let basicSelector = '';
+    let basicSelector = '';
 
-  if (
-    keyword.Value === KeywordType.TAG ||
-    keyword.Value === KeywordType.ELEMENT
-  ) {
-    basicSelector = valueToken.Value;
-  } else if (keyword.Value === KeywordType.ID) {
-    basicSelector = getIdSelector(keyword, simpleComparatorType, valueToken);
-  } else if (keyword.Value === KeywordType.CLASS) {
-    basicSelector = getClassSelector(keyword, simpleComparatorType, valueToken);
-  } else if (
-    keyword.Value === KeywordType.ATTRIBUTE ||
-    keyword.Value === KeywordType.STYLE
-  ) {
-    basicSelector = getAttributeSelector(
-      keyword,
-      simpleComparatorType,
-      valueToken,
-    );
-  } else {
-    throw new Error(
-      `Unable to handle foreign selector of type ${keyword.Value}.`,
-    );
-  }
+    if (keyword.Value === KeywordType.TAG || keyword.Value === KeywordType.ELEMENT) {
+        basicSelector = valueToken.Value;
+    } else if (keyword.Value === KeywordType.ID) {
+        basicSelector = getIdSelector(keyword, simpleComparatorType, valueToken);
+    } else if (keyword.Value === KeywordType.CLASS) {
+        basicSelector = getClassSelector(keyword, simpleComparatorType, valueToken);
+    } else if (keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.STYLE) {
+        basicSelector = getAttributeSelector(keyword, simpleComparatorType, valueToken);
+    } else {
+        throw new Error(`Unable to handle foreign selector of type ${keyword.Value}.`);
+    }
 
-  if (
-    simpleComparatorType === OperationType.NOT_CONTAINS ||
-    simpleComparatorType === OperationType.NOT_EQUALS ||
-    simpleComparatorType === OperationType.NOT_LIKE
-  ) {
-    basicSelector = `:not(${basicSelector})`;
-  }
+    if (simpleComparatorType === OperationType.NOT_CONTAINS || simpleComparatorType === OperationType.NOT_EQUALS || simpleComparatorType === OperationType.NOT_LIKE) {
+        basicSelector = `:not(${basicSelector})`;
+    }
 
-  return {
-    Value: basicSelector,
-    KeywordType: keyword.Value as KeywordType,
-    JoiningOperator: expression.JoiningOperator,
-  };
+    return {
+        Value: basicSelector,
+        KeywordType: keyword.Value as KeywordType,
+        JoiningOperator: expression.JoiningOperator,
+    };
 }
 
 /**
@@ -187,59 +139,44 @@ function createSelector(expression: Expression): Selector {
  * @param valueToken - The token containing the attribute or style value.
  * @returns A string representing the attribute selector in CSS format.
  */
-function getAttributeSelector(
-  keyword: Token,
-  simpleComparatorType: OperationType,
-  valueToken: Token,
-): string {
-  if (
-    keyword.Value === KeywordType.ATTRIBUTE &&
-    keyword.Type !== TokenType.FUNCTION
-  ) {
-    return `[${valueToken.Value}]`;
-  }
+function getAttributeSelector(keyword: Token, simpleComparatorType: OperationType, valueToken: Token): string {
+    if (keyword.Value === KeywordType.ATTRIBUTE && keyword.Type !== TokenType.FUNCTION) {
+        return `[${valueToken.Value}]`;
+    }
 
-  const attributeName =
-    keyword.Type === TokenType.FUNCTION
-      ? (keyword?.Arguments?.[0] ?? '')
-      : getAttributeName(keyword);
-  let selector = '';
+    const attributeName = keyword.Type === TokenType.FUNCTION ? (keyword?.Arguments?.[0] ?? '') : getAttributeName(keyword);
+    let selector = '';
 
-  switch (simpleComparatorType) {
-    case OperationType.EQUALS:
-    case OperationType.NOT_EQUALS:
-      selector = '=';
-      break;
-    case OperationType.LIKE:
-    case OperationType.NOT_LIKE:
-      const hasStart = valueToken.Value.startsWith(SymbolType.PERCENT);
-      const hasEnd = valueToken.Value.endsWith(SymbolType.PERCENT);
+    switch (simpleComparatorType) {
+        case OperationType.EQUALS:
+        case OperationType.NOT_EQUALS:
+            selector = '=';
+            break;
+        case OperationType.LIKE:
+        case OperationType.NOT_LIKE:
+            const hasStart = valueToken.Value.startsWith(SymbolType.PERCENT);
+            const hasEnd = valueToken.Value.endsWith(SymbolType.PERCENT);
 
-      if (hasStart && !hasEnd) {
-        selector = '^=';
-      } else if (!hasStart && hasEnd) {
-        selector = '$=';
-      } else {
-        selector = '*=';
-      }
+            if (hasStart && !hasEnd) {
+                selector = '^=';
+            } else if (!hasStart && hasEnd) {
+                selector = '$=';
+            } else {
+                selector = '*=';
+            }
 
-      valueToken.Value = valueToken.Value.slice(
-        hasStart ? 1 : 0,
-        hasEnd ? valueToken.Value.length - 1 : undefined,
-      );
+            valueToken.Value = valueToken.Value.slice(hasStart ? 1 : 0, hasEnd ? valueToken.Value.length - 1 : undefined);
 
-      break;
-    case OperationType.CONTAINS:
-    case OperationType.NOT_CONTAINS:
-      selector = '~=';
-      break;
-    default:
-      throw new Error(
-        `Invalid simple comparator type: ${simpleComparatorType}`,
-      );
-  }
+            break;
+        case OperationType.CONTAINS:
+        case OperationType.NOT_CONTAINS:
+            selector = '~=';
+            break;
+        default:
+            throw new Error(`Invalid simple comparator type: ${simpleComparatorType}`);
+    }
 
-  return `[${attributeName}${selector}"${valueToken.Value}"]`;
+    return `[${attributeName}${selector}"${valueToken.Value}"]`;
 }
 
 /**
@@ -252,19 +189,12 @@ function getAttributeSelector(
  * @param valueToken - The token containing the ID value.
  * @returns A string representing the ID selector in CSS format, or an attribute selector if needed.
  */
-function getIdSelector(
-  keyword: Token,
-  simpleComparatorType: OperationType,
-  valueToken: Token,
-): string {
-  if (
-    simpleComparatorType === OperationType.EQUALS ||
-    simpleComparatorType === OperationType.NOT_EQUALS
-  ) {
-    return `#${valueToken.Value}`;
-  } else {
-    return getAttributeSelector(keyword, simpleComparatorType, valueToken);
-  }
+function getIdSelector(keyword: Token, simpleComparatorType: OperationType, valueToken: Token): string {
+    if (simpleComparatorType === OperationType.EQUALS || simpleComparatorType === OperationType.NOT_EQUALS) {
+        return `#${valueToken.Value}`;
+    } else {
+        return getAttributeSelector(keyword, simpleComparatorType, valueToken);
+    }
 }
 
 /**
@@ -277,19 +207,12 @@ function getIdSelector(
  * @param valueToken - The token containing the class value.
  * @returns A string representing the class selector in CSS format, or an attribute selector if needed.
  */
-function getClassSelector(
-  keyword: Token,
-  simpleComparatorType: OperationType,
-  valueToken: Token,
-): string {
-  if (
-    simpleComparatorType === OperationType.EQUALS ||
-    simpleComparatorType === OperationType.NOT_EQUALS
-  ) {
-    return `.${valueToken.Value}`;
-  } else {
-    return getAttributeSelector(keyword, simpleComparatorType, valueToken);
-  }
+function getClassSelector(keyword: Token, simpleComparatorType: OperationType, valueToken: Token): string {
+    if (simpleComparatorType === OperationType.EQUALS || simpleComparatorType === OperationType.NOT_EQUALS) {
+        return `.${valueToken.Value}`;
+    } else {
+        return getAttributeSelector(keyword, simpleComparatorType, valueToken);
+    }
 }
 
 /**
@@ -301,15 +224,15 @@ function getClassSelector(
  * @returns A string representing the parsed and formatted query.
  */
 function parser(tokens: Token[]): String {
-  const queryTokens = buildExpressions([...tokens]);
-  console.log('Query Tokens: ', queryTokens);
+    const queryTokens = buildExpressions([...tokens]);
+    console.log('Query Tokens: ', deepCopy(queryTokens));
 
-  const groupings = groupSelectors(queryTokens);
-  console.log('Groupings: ', groupings);
+    const groupings = groupSelectors(queryTokens);
+    console.log('Groupings: ', groupings);
 
-  const query = generateQuery(groupings);
+    const query = generateQuery(groupings);
 
-  return query;
+    return query;
 }
 
 export { parser };

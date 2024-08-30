@@ -33,10 +33,10 @@ Please see [Local Development](#Local-Development) for working with the source.
 
 ### TODO
 
-- ~~(***Active***) Extend attribute substring selectors~~
+- ~~ Extend attribute substring selectors~~
 - ~~Implement `:not()`~~
-- Force tag selectors to front of query
-- Resolve seelctors duplicating with multiple un-grouped `OR` operators
+- (***Next***) Force tag selectors to front of query
+- ~~(***Active***) Resolve seelctors duplicating with multiple un-grouped `OR` operators~~
 - Implement combinators, ex. ` `, `>`, `+`, `~`
 - Implement pseudo selectors
 - Improve type checking & syntax errors
