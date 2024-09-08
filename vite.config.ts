@@ -37,6 +37,10 @@ export default defineConfig({
     },
     test: {
         watch: false,
+        includeSource: ['src/**/*.ts'],
+    },
+    define: {
+        'import.meta.vitest': 'undefined',
     },
     resolve: {
         alias: [

@@ -3,7 +3,7 @@ import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer
 import { keywordPriority } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
-import { deepCopy, getAttributeName, getSimpleOperationType } from './utilities';
+import { getAttributeName, getSimpleOperationType } from './utilities';
 import { hasSecondaryOperator } from './validators';
 
 /**
@@ -236,10 +236,10 @@ function getClassSelector(keyword: Token, simpleComparatorType: OperationType, v
  */
 function parser(tokens: Token[]): String {
     const queryTokens = buildExpressions([...tokens]);
-    console.log('Query Tokens: ', deepCopy(queryTokens));
+    //console.log('Query Tokens: ', deepCopy(queryTokens));
 
     const groupings = groupSelectors(queryTokens);
-    console.log('Groupings: ', groupings);
+    //console.log('Groupings: ', groupings);
 
     const query = generateQuery(groupings);
 
