@@ -35,12 +35,12 @@ Please see [Local Development](#Local-Development) for working with the source.
 
 - ~~ Extend attribute substring selectors~~
 - ~~Implement `:not()`~~
-- ~~(***Active***) Force tag selectors to front of query~~
+- ~~Force tag selectors to front of query~~
 - ~~Resolve selectors duplicating with multiple un-grouped `OR` operators~~
 - (***Next***)Implement combinators, ex. ` `, `>`, `+`, `~`
 - Implement pseudo selectors
 - Improve type checking & syntax errors
-- Unit testing
+- (***Active***)Unit testing
 - Support escaping characters?
 
 ## Local Development
@@ -50,6 +50,7 @@ Please see [Local Development](#Local-Development) for working with the source.
 - `dev` - starts dev server
 - `build` - generates the following bundles: ESM (`.js`) and IIFE (`.iife.js`). The name of bundle is automatically taken from `package.json` name property
 - `test` - starts vitest and runs all tests
+- `test:watch` - starts vitest and runs all tests, but watch for changes & rerun when changes detected
 - `test:coverage` - starts vitest and run all tests with code coverage report
 - `lint:scripts` - lint `.ts` files with eslint
 - `lint:styles` - lint `.css` and `.scss` files with stylelint

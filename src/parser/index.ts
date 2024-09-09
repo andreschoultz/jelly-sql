@@ -112,18 +112,28 @@ function createSelector(expression: Expression): Selector {
         secondaryOperator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER]);
     }
 
-    const valueToken = expression.consumeToken(TokenType.STRING);
     const simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
 
     let basicSelector = '';
 
     if (keyword.Value === KeywordType.TAG || keyword.Value === KeywordType.ELEMENT) {
+        const valueToken = expression.consumeToken(TokenType.STRING);
         basicSelector = valueToken.Value;
     } else if (keyword.Value === KeywordType.ID) {
+        const valueToken = expression.consumeToken(TokenType.STRING, [TokenType.NUMERIC]);
         basicSelector = getIdSelector(keyword, simpleComparatorType, valueToken);
     } else if (keyword.Value === KeywordType.CLASS) {
+        const valueToken = expression.consumeToken(TokenType.STRING, [TokenType.NUMERIC]);
         basicSelector = getClassSelector(keyword, simpleComparatorType, valueToken);
     } else if (keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.STYLE) {
+        let alternateTypes: TokenType[] | null = null;
+
+        if (keyword.Value === KeywordType.ATTRIBUTE && keyword.Type === TokenType.FUNCTION) {
+            alternateTypes = [TokenType.NUMERIC];
+        }
+
+        const valueToken = expression.consumeToken(TokenType.STRING, alternateTypes);
+
         basicSelector = getAttributeSelector(keyword, simpleComparatorType, valueToken);
     } else {
         throw new Error(`Unable to handle foreign selector of type ${keyword.Value}.`);
@@ -177,6 +187,22 @@ function getAttributeSelector(keyword: Token, simpleComparatorType: OperationTyp
             }
 
             valueToken.Value = valueToken.Value.slice(hasStart ? 1 : 0, hasEnd ? valueToken.Value.length - 1 : undefined);
+
+            // TODO: Improve escape character handling
+            const hasEscapedStart = valueToken.Value.startsWith(`[${SymbolType.PERCENT}]`);
+            const hasEscapedEnd = valueToken.Value.endsWith(`[${SymbolType.PERCENT}]`);
+
+            if (hasEscapedStart || hasEscapedEnd) {
+                valueToken.Value = valueToken.Value.slice(hasEscapedStart ? 3 : 0, hasEscapedEnd ? valueToken.Value.length - 3 : undefined);
+
+                if (hasEscapedStart) {
+                    valueToken.Value = `%${valueToken.Value}`;
+                }
+
+                if (hasEscapedEnd) {
+                    valueToken.Value = `${valueToken.Value}%`;
+                }
+            }
 
             break;
         case OperationType.CONTAINS:
