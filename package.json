@@ -17,6 +17,7 @@
     "dev": "vite --host",
     "build": "rimraf --glob build/**/* && tsc && vite build && dts-bundle-generator --config ./dts-bundle-generator.config.ts && copyfiles ./package.json build",
     "test": "vitest",
+    "test:watch": "vitest watch",
     "test:coverage": "vitest --coverage",
     "lint:scripts": "eslint . --ext .ts",
     "lint:styles": "stylelint ./**/*.{css,scss}",

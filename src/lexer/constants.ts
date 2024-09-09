@@ -17,6 +17,7 @@ const keywords: { [key: string]: TokenType } = {
 
 const operators: { [key: string]: TokenType } = {
     [SymbolType.ASSIGN]: TokenType.OPERATOR,
+    [SymbolType.EQ]: TokenType.OPERATOR,
     [SymbolType.NEQ]: TokenType.OPERATOR,
     [SymbolType.NEQ_LG]: TokenType.OPERATOR,
     [SymbolType.TIMES]: TokenType.OPERATOR,
