@@ -4,6 +4,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@@/*": ["./*"],
+      "rollup/parseAst": ["./node_modules/rollup/dist/parseAst"]
     },
     "target": "ESNext",
     "useDefineForClassFields": true,
