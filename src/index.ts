@@ -9,5 +9,3 @@ export function query(sql: string) {
 
     return querySelector;
 }
-
-export * from './localTesting';

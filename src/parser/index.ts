@@ -18,18 +18,22 @@ function createSelectors(queryToken: QueryToken): SelectorGroup[] {
     let selectors: Selector[] = [];
     let groupings: SelectorGroup[] = [];
 
+    let previousSelector: Selector | null = null;
+
     for (let i = 0; i < queryToken.Expressions.length; i++) {
         const selector = createSelector(queryToken.Expressions[i]);
 
-        if (selector.JoiningOperator === OperatorType.AND) {
-            selectors.push(selector);
-        } else {
-            groupings.push({ Selectors: [selector] });
+        if (selector.JoiningOperator === OperatorType.OR && (previousSelector?.JoiningOperator === OperatorType.AND || previousSelector?.JoiningOperator === OperatorType.OR)) {
+            groupings.push({ Selectors: [...selectors] });
+            selectors = [];
         }
+
+        selectors.push(selector);
+        previousSelector = selector;
     }
 
     if (selectors.length > 0) {
-        groupings.unshift({ Selectors: selectors });
+        groupings.push({ Selectors: selectors });
     }
 
     return groupings;

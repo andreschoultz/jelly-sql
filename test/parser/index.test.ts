@@ -4,6 +4,10 @@ import { query } from '../../src/index';
 import { KeywordType, OperatorType, SymbolType } from '../../src/lexer/types';
 
 describe('QuerySelector Generator', () => {
+    test('The jelly goes, jiggle-jiggle', () => {
+        expect('jelly-sql').toEqual('jelly-sql');
+    });
+
     describe('Isolated Basic', () => {
         const generateLowerCaseVariations = (arr: string[]) => [...arr, ...arr.map(x => x.toLowerCase())];
 
@@ -24,7 +28,7 @@ describe('QuerySelector Generator', () => {
         describe('TAG | ELEMENT', () => {
             const keywords = [KeywordType.TAG, KeywordType.ELEMENT];
 
-            test('Valid - Equals; Not Equals', () => {
+            test('Equals; Not Equals', () => {
                 const equalOperators = [SymbolType.ASSIGN, SymbolType.EQ, OperatorType.EQUALS];
                 const notEqualOperators = [SymbolType.NEQ, SymbolType.NEQ_LG, `${OperatorType.NOT} ${OperatorType.EQUALS}`];
 
@@ -63,7 +67,7 @@ describe('QuerySelector Generator', () => {
         describe('ID', () => {
             const keywords = [KeywordType.ID];
 
-            test('Valid - Equals; Not Equals', () => {
+            test('Equals; Not Equals', () => {
                 const equalOperators = [SymbolType.ASSIGN, SymbolType.EQ, OperatorType.EQUALS];
                 const notEqualOperators = [SymbolType.NEQ, SymbolType.NEQ_LG, `${OperatorType.NOT} ${OperatorType.EQUALS}`];
 
@@ -98,7 +102,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Like; Not Like', () => {
+            test('Like; Not Like', () => {
                 const likeOperators = [OperatorType.LIKE];
                 const notEqualOperators = [`${OperatorType.NOT} ${OperatorType.LIKE}`];
 
@@ -145,7 +149,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Contains; Not Contains', () => {
+            test('Contains; Not Contains', () => {
                 const containOperators = [OperatorType.CONTAINS];
                 const notContainOperators = [`${OperatorType.NOT} ${OperatorType.CONTAINS}`];
 
@@ -184,7 +188,7 @@ describe('QuerySelector Generator', () => {
         describe('CLASS', () => {
             const keywords = [KeywordType.CLASS];
 
-            test('Valid - Equals; Not Equals', () => {
+            test('Equals; Not Equals', () => {
                 const equalOperators = [SymbolType.ASSIGN, SymbolType.EQ, OperatorType.EQUALS];
                 const notEqualOperators = [SymbolType.NEQ, SymbolType.NEQ_LG, `${OperatorType.NOT} ${OperatorType.EQUALS}`];
 
@@ -219,7 +223,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Like; Not Like', () => {
+            test('Like; Not Like', () => {
                 const likeOperators = [OperatorType.LIKE];
                 const notEqualOperators = [`${OperatorType.NOT} ${OperatorType.LIKE}`];
 
@@ -266,7 +270,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Contains; Not Contains', () => {
+            test('Contains; Not Contains', () => {
                 const containOperators = [OperatorType.CONTAINS];
                 const notContainOperators = [`${OperatorType.NOT} ${OperatorType.CONTAINS}`];
 
@@ -305,7 +309,7 @@ describe('QuerySelector Generator', () => {
         describe('ATTRIBUTE | ATTR', () => {
             const keywords = [KeywordType.ATTRIBUTE, KeywordType.ATTR];
 
-            test('Valid - Name match', () => {
+            test('Name match', () => {
                 const equalOperators = [SymbolType.ASSIGN, SymbolType.EQ, OperatorType.EQUALS];
                 const notEqualOperators = [SymbolType.NEQ, SymbolType.NEQ_LG, `${OperatorType.NOT} ${OperatorType.EQUALS}`];
 
@@ -340,7 +344,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Equals; Not Equals', () => {
+            test('Equals; Not Equals', () => {
                 const equalOperators = [SymbolType.ASSIGN, SymbolType.EQ, OperatorType.EQUALS];
                 const notEqualOperators = [SymbolType.NEQ, SymbolType.NEQ_LG, `${OperatorType.NOT} ${OperatorType.EQUALS}`];
 
@@ -377,7 +381,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Like; Not Like', () => {
+            test('Like; Not Like', () => {
                 const likeOperators = [OperatorType.LIKE];
                 const notEqualOperators = [`${OperatorType.NOT} ${OperatorType.LIKE}`];
 
@@ -436,7 +440,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Contains; Not Contains', () => {
+            test('Contains; Not Contains', () => {
                 const containOperators = [OperatorType.CONTAINS];
                 const notContainOperators = [`${OperatorType.NOT} ${OperatorType.CONTAINS}`];
 
@@ -477,7 +481,7 @@ describe('QuerySelector Generator', () => {
         describe('STYLE', () => {
             const keywords = [KeywordType.STYLE];
 
-            test('Valid - Equals; Not Equals', () => {
+            test('Equals; Not Equals', () => {
                 const equalOperators = [SymbolType.ASSIGN, SymbolType.EQ, OperatorType.EQUALS];
                 const notEqualOperators = [SymbolType.NEQ, SymbolType.NEQ_LG, `${OperatorType.NOT} ${OperatorType.EQUALS}`];
 
@@ -517,7 +521,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Like; Not Like', () => {
+            test('Like; Not Like', () => {
                 const likeOperators = [OperatorType.LIKE];
                 const notEqualOperators = [`${OperatorType.NOT} ${OperatorType.LIKE}`];
 
@@ -576,7 +580,7 @@ describe('QuerySelector Generator', () => {
                 }
             });
 
-            test('Valid - Contains; Not Contains', () => {
+            test('Contains; Not Contains', () => {
                 const containOperators = [OperatorType.CONTAINS];
                 const notContainOperators = [`${OperatorType.NOT} ${OperatorType.CONTAINS}`];
 
@@ -619,6 +623,83 @@ describe('QuerySelector Generator', () => {
     });
 
     describe('Extended Intermediate', () => {
-        test('');
+        test('Keyword Order Priority', () => {
+            const testCases = [
+                { input: `TAG = 'a' AND ID = 'confirm-link'`, expected: `a#confirm-link` },
+                { input: `TAG = 'a' AND CLASS = 'btn-blue'`, expected: `a.btn-blue` },
+                { input: `TAG = 'a' AND ID = 'confirm-link' AND CLASS = 'btn-blue'`, expected: `a#confirm-link.btn-blue` },
+                { input: `ID = 'confirm-link' AND TAG = 'a'`, expected: `a#confirm-link` },
+                { input: `CLASS = 'btn-blue' AND TAG = 'a'`, expected: `a.btn-blue` },
+                { input: `CLASS = 'btn-blue' AND ID = 'confirm-link' AND TAG = 'a'`, expected: `a#confirm-link.btn-blue` },
+                { input: `ATTR('value') = 'ready' AND CLASS = 'btn-blue' AND ID = 'confirm-link' AND TAG = 'a'`, expected: `a#confirm-link.btn-blue[value="ready"]` },
+            ];
+
+            for (const { input, expected } of testCases) {
+                const queryString = `SELECT * FROM DOM WHERE ${input}`;
+
+                expect(query(queryString)).toBe(expected);
+            }
+        });
+
+        test('Auto Groupings (AND | OR)', () => {
+            const testCases = [
+                { input: `TAG = 'a' OR CLASS = 'link'`, expected: `a, .link` },
+                { input: `TAG = 'a' AND CLASS = 'active' OR CLASS = 'link'`, expected: `a.active, .link` },
+                { input: `TAG = 'a' AND CLASS = 'active' OR CLASS = 'link' OR TAG = 'button'`, expected: `a.active, .link, button` },
+                { input: `TAG = 'a' AND CLASS = 'active' OR CLASS = 'link' OR TAG = 'button' AND ID = 'to-top-link'`, expected: `a.active, .link, button#to-top-link` },
+                {
+                    input: `TAG = 'a' AND CLASS = 'active' OR CLASS = 'link' AND TAG = 'a' OR TAG = 'button' AND ID = 'to-top-link'`,
+                    expected: `a.active, a.link, button#to-top-link`,
+                },
+            ];
+
+            for (const { input, expected } of testCases) {
+                const queryString = `SELECT * FROM DOM WHERE ${input}`;
+
+                expect(query(queryString)).toBe(expected);
+            }
+        });
+
+        describe('Shallow Groupings with Braces (AND | OR)', () => {
+            test('Manual Braces Must Match Auto Groupings', () => {
+                const testCases = [
+                    /* Original subset from test "Groupings (AND | OR)" */
+                    { input: `(TAG = 'a') OR (CLASS = 'link')`, expected: `a, .link` },
+                    { input: `(TAG = 'a' AND CLASS = 'active') OR (CLASS = 'link')`, expected: `a.active, .link` },
+                    { input: `(TAG = 'a' AND CLASS = 'active') OR (CLASS = 'link') OR (TAG = 'button')`, expected: `a.active, .link, button` },
+                    { input: `(TAG = 'a' AND CLASS = 'active') OR (CLASS = 'link') OR (TAG = 'button' AND ID = 'to-top-link')`, expected: `a.active, .link, button#to-top-link` },
+                    {
+                        input: `(TAG = 'a' AND CLASS = 'active') OR (CLASS = 'link' AND TAG = 'a') OR (TAG = 'button' AND ID = 'to-top-link')`,
+                        expected: `a.active, a.link, button#to-top-link`,
+                    },
+                ];
+
+                for (const { input, expected } of testCases) {
+                    const queryString = `SELECT * FROM DOM WHERE ${input}`;
+
+                    expect(query(queryString)).toBe(expected);
+                }
+            });
+
+            test('Single [AND] Cross Apply with [OR] Grouping', () => {
+                const testCases = [
+                    { input: `TAG = 'a' AND (CLASS = 'active' OR CLASS = 'link' AND ID = 'old-link')`, expected: `a.active, a#old-link.link` },
+                    { input: `TAG = 'a' AND (CLASS = 'active' AND ID = 'new-link' OR CLASS = 'link')`, expected: `a#new-link.active, a.link` },
+                    { input: `TAG = 'a' AND (CLASS = 'active' AND ID = 'new-link' OR CLASS = 'link' AND ID = 'old-link')`, expected: `a#new-link.active, a#old-link.link` },
+                    {
+                        input: `CLASS = 'orange' AND TAG = 'a' AND (CLASS = 'active' AND ID = 'new-link' OR CLASS = 'link' AND ID = 'old-link')`,
+                        expected: `a#new-link.orange.active, a#old-link.orange.link`,
+                    },
+                    { input: `TAG = 'a' AND (CLASS = 'active' OR CLASS = 'link' OR ATTR <> 'disabled')`, expected: `a.active, a.link, a:not([disabled])` },
+                    // {input: `(CLASS = 'active' AND ID = 'new-link' OR CLASS = 'link' AND ID = 'old-link') AND TAG = 'a'`, expected: `a#new-link.active, a#old-link.link`}, // TODO: Add support for adding post multiply
+                ];
+
+                for (const { input, expected } of testCases) {
+                    const queryString = `SELECT * FROM DOM WHERE ${input}`;
+
+                    expect(query(queryString)).toBe(expected);
+                }
+            });
+        });
     });
 });
