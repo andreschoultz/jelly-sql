@@ -12,6 +12,7 @@ const keywords: { [key: string]: TokenType } = {
     [KeywordType.ID]: TokenType.KEYWORD,
     [KeywordType.CLASS]: TokenType.KEYWORD,
     [KeywordType.ATTRIBUTE]: TokenType.KEYWORD,
+    [KeywordType.ATTR]: TokenType.KEYWORD,
     [KeywordType.STYLE]: TokenType.KEYWORD,
 } as const;
 
@@ -32,6 +33,7 @@ const operators: { [key: string]: TokenType } = {
 
 const functions: { [key: string]: TokenType } = {
     [FunctionType.ATTRIBUTE]: TokenType.FUNCTION,
+    [FunctionType.ATTR]: TokenType.FUNCTION,
 };
 
 /** ------ Regex ------ */

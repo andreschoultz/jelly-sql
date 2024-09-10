@@ -154,7 +154,14 @@ import { parser } from './parser';
     AND Attribute('data-color') = 'red'
  */
 
-const sqlDomQuery = `SELECT * FROM DOM WHERE ATTRIBUTE('element_width') like '90[%]%'`;
+const sqlDomQuery = `SELECT * FROM DOM WHERE
+    TAG = 'a'
+    AND (
+            CLASS = 'active'
+            OR CLASS = 'link'
+            OR ATTR <> 'disabled'
+        )
+`;
 
 const lexerTokens = lexer(sqlDomQuery);
 console.log('Lexer Tokens: ', lexerTokens);

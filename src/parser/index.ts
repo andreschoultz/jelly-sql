@@ -18,18 +18,22 @@ function createSelectors(queryToken: QueryToken): SelectorGroup[] {
     let selectors: Selector[] = [];
     let groupings: SelectorGroup[] = [];
 
+    let previousSelector: Selector | null = null;
+
     for (let i = 0; i < queryToken.Expressions.length; i++) {
         const selector = createSelector(queryToken.Expressions[i]);
 
-        if (selector.JoiningOperator === OperatorType.AND) {
-            selectors.push(selector);
-        } else {
-            groupings.push({ Selectors: [selector] });
+        if (selector.JoiningOperator === OperatorType.OR && (previousSelector?.JoiningOperator === OperatorType.AND || previousSelector?.JoiningOperator === OperatorType.OR)) {
+            groupings.push({ Selectors: [...selectors] });
+            selectors = [];
         }
+
+        selectors.push(selector);
+        previousSelector = selector;
     }
 
     if (selectors.length > 0) {
-        groupings.unshift({ Selectors: selectors });
+        groupings.push({ Selectors: selectors });
     }
 
     return groupings;
@@ -125,10 +129,10 @@ function createSelector(expression: Expression): Selector {
     } else if (keyword.Value === KeywordType.CLASS) {
         const valueToken = expression.consumeToken(TokenType.STRING, [TokenType.NUMERIC]);
         basicSelector = getClassSelector(keyword, simpleComparatorType, valueToken);
-    } else if (keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.STYLE) {
+    } else if (keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.ATTR || keyword.Value === KeywordType.STYLE) {
         let alternateTypes: TokenType[] | null = null;
 
-        if (keyword.Value === KeywordType.ATTRIBUTE && keyword.Type === TokenType.FUNCTION) {
+        if ((keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.ATTR) && keyword.Type === TokenType.FUNCTION) {
             alternateTypes = [TokenType.NUMERIC];
         }
 
@@ -161,7 +165,7 @@ function createSelector(expression: Expression): Selector {
  * @returns A string representing the attribute selector in CSS format.
  */
 function getAttributeSelector(keyword: Token, simpleComparatorType: OperationType, valueToken: Token): string {
-    if (keyword.Value === KeywordType.ATTRIBUTE && keyword.Type !== TokenType.FUNCTION) {
+    if ((keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.ATTR) && keyword.Type !== TokenType.FUNCTION) {
         return `[${valueToken.Value}]`;
     }
 
