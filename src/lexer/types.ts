@@ -23,7 +23,8 @@ enum KeywordType {
     ELEMENT = 'ELEMENT', // ELEMENT == TAG
     ID = 'ID',
     CLASS = 'CLASS',
-    ATTRIBUTE = 'ATTRIBUTE',
+    ATTRIBUTE = 'ATTRIBUTE', // ATTRIBUTE == ATR
+    ATTR = 'ATTR', // ATR == ATTRIBUTE
     STYLE = 'STYLE',
 }
 
@@ -37,7 +38,8 @@ enum OperatorType {
 }
 
 enum FunctionType {
-    ATTRIBUTE = 'ATTRIBUTE',
+    ATTRIBUTE = 'ATTRIBUTE', // ATTRIBUTE == ATR
+    ATTR = 'ATTR', // ATR == ATTRIBUTE
     TAG = 'TAG',
 }
 

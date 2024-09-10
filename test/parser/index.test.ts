@@ -302,8 +302,8 @@ describe('QuerySelector Generator', () => {
             });
         });
 
-        describe('ATTRIBUTE', () => {
-            const keywords = [KeywordType.ATTRIBUTE];
+        describe('ATTRIBUTE | ATTR', () => {
+            const keywords = [KeywordType.ATTRIBUTE, KeywordType.ATTR];
 
             test('Valid - Name match', () => {
                 const equalOperators = [SymbolType.ASSIGN, SymbolType.EQ, OperatorType.EQUALS];
@@ -616,5 +616,9 @@ describe('QuerySelector Generator', () => {
                 }
             });
         });
+    });
+
+    describe('Extended Intermediate', () => {
+        test('');
     });
 });
