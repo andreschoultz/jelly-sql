@@ -35,6 +35,14 @@ enum OperatorType {
     NOT = 'NOT',
     LIKE = 'LIKE',
     CONTAINS = 'CONTAINS',
+
+    /* Combinators */
+    CHILD = 'CHILD',
+    SIBLING = 'SIBLING',
+    NEXT = 'NEXT',
+    WITHIN = 'WITHIN',
+    OF = 'OF',
+    TO = 'TO',
 }
 
 enum FunctionType {
@@ -46,6 +54,9 @@ enum FunctionType {
 enum CompoundType {
     NOT_EQUALS = 'NOT EQUALS',
     NOT_LIKE = 'NOT LIKE',
+    CHILD_OF = 'CHILD OF',
+    NEXT_TO = 'NEXT TO',
+    SIBLING_OF = 'SIBLING OF',
 }
 
 enum SymbolType {

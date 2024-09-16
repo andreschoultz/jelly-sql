@@ -1,4 +1,4 @@
-import { KeywordType, OperatorType, SymbolType, Token } from '@/lexer/types';
+import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
 import { Expression, OperationType } from './types';
 
@@ -26,8 +26,16 @@ function getSimpleOperationType(value: string, secondaryValue: string | null): O
         return OperationType.NOT_LIKE;
     } else if (value === OperatorType.CONTAINS) {
         return OperationType.CONTAINS;
-    } else if (value === OperatorType.NOT && secondaryValue === OperationType.CONTAINS) {
+    } else if (value === OperatorType.NOT && secondaryValue === OperatorType.CONTAINS) {
         return OperationType.NOT_CONTAINS;
+    } else if (value === OperatorType.CHILD && secondaryValue === OperatorType.OF) {
+        return OperationType.CHILD_OF;
+    } else if (value === OperatorType.SIBLING && secondaryValue === OperatorType.OF) {
+        return OperationType.SIBLING_OF;
+    } else if (value === OperatorType.NEXT && secondaryValue === OperatorType.TO) {
+        return OperationType.NEXT_TO;
+    } else if (value === OperatorType.WITHIN) {
+        return OperationType.WITHIN;
     }
 
     return OperationType.UNKNOWN;
@@ -58,4 +66,12 @@ function deepCopy<T>(obj: T): T {
     return copy;
 }
 
-export { getAttributeName, getSimpleOperationType, deepCopy };
+function isValueToken(token: Token | null): boolean {
+    if (!token) {
+        return false;
+    }
+
+    return token.Type === TokenType.STRING || token.Type === TokenType.NUMERIC;
+}
+
+export { getAttributeName, getSimpleOperationType, deepCopy, isValueToken };

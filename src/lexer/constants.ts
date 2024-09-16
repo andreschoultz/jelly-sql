@@ -29,7 +29,14 @@ const operators: { [key: string]: TokenType } = {
     [OperatorType.NOT]: TokenType.OPERATOR,
     [OperatorType.LIKE]: TokenType.OPERATOR,
     [OperatorType.CONTAINS]: TokenType.OPERATOR,
+    [OperatorType.CHILD]: TokenType.OPERATOR,
+    [OperatorType.SIBLING]: TokenType.OPERATOR,
+    [OperatorType.WITHIN]: TokenType.OPERATOR,
+    [OperatorType.OF]: TokenType.OPERATOR,
+    [OperatorType.TO]: TokenType.OPERATOR,
 } as const;
+
+const logicalOperators: OperatorType[] = [OperatorType.AND, OperatorType.OR];
 
 const functions: { [key: string]: TokenType } = {
     [FunctionType.ATTRIBUTE]: TokenType.FUNCTION,
@@ -48,4 +55,4 @@ const Regex = {
     function: /^\w+\s*\([^)]*\)/,
 };
 
-export { Regex, keywords, operators, functions };
+export { Regex, keywords, operators, logicalOperators, functions };

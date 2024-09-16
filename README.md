@@ -37,10 +37,10 @@ Please see [Local Development](#Local-Development) for working with the source.
 - ~~Implement `:not()`~~
 - ~~Force tag selectors to front of query~~
 - ~~Resolve selectors duplicating with multiple un-grouped `OR` operators~~
-- (***Next***)Implement combinators, ex. ` `, `>`, `+`, `~`
-- Implement pseudo selectors
+- (***Active***)Implement combinators, ex. ` `, `>`, `+`, `~`
+- (***Next***)Implement pseudo selectors
 - Improve type checking & syntax errors
-- (***Active***)Unit testing
+- ~~Unit testing~~
 - Support escaping characters?
 
 ## Local Development

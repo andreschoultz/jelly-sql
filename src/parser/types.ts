@@ -8,6 +8,12 @@ enum OperationType {
     NOT_CONTAINS = 'NOT_CONTAINS',
     LIKE = 'LIKE',
     NOT_LIKE = 'NOT_LIKE',
+
+    /* Combinators */
+    CHILD_OF = 'CHILD_OF',
+    SIBLING_OF = 'SIBLING_OF',
+    NEXT_TO = 'NEXT_TO',
+    WITHIN = 'WITHIN',
 }
 
 class Expression {

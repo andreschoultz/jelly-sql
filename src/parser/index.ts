@@ -3,7 +3,7 @@ import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer
 import { keywordPriority } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
-import { getAttributeName, getSimpleOperationType } from './utilities';
+import { getAttributeName, getSimpleOperationType, isValueToken } from './utilities';
 import { hasSecondaryOperator } from './validators';
 
 /**
@@ -109,14 +109,20 @@ function generateQuery(groupings: SelectorGroup[]): string {
  */
 function createSelector(expression: Expression): Selector {
     const keyword = expression.consumeToken(TokenType.KEYWORD, [TokenType.FUNCTION]);
-    const comparator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER, TokenType.SYMBOL]);
+    let comparator: Token | null = null;
+    let simpleComparatorType = OperationType.EQUALS;
     let secondaryOperator: Token | undefined;
 
-    if (expression.nextToken() && hasSecondaryOperator(comparator, expression.nextToken())) {
-        secondaryOperator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER]);
-    }
+    // Don't parse for comparator-less expressions. Ex. `...WHERE TAG('a')`
+    if (isValueToken(expression.nextToken()) == false) {
+        comparator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER, TokenType.SYMBOL]);
 
-    const simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
+        if (expression.nextToken() && hasSecondaryOperator(comparator, expression.nextToken())) {
+            secondaryOperator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER]);
+        }
+
+        simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
+    }
 
     let basicSelector = '';
 

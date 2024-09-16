@@ -155,7 +155,7 @@ import { parser } from './parser';
  */
 
 const sqlDomQuery = `SELECT * FROM DOM WHERE
-    TAG = 'a'
+    TAG('a')
     AND (
             CLASS = 'active'
             OR CLASS = 'link'
