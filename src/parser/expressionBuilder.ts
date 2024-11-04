@@ -1,6 +1,7 @@
 import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
 import { CompoundExpression, Expression, JoiningOperatorType, QueryToken } from './types';
+import { isCombinatorOperator, isOrSubstitute } from './utilities';
 
 let _tokens: Token[] = [];
 
@@ -11,6 +12,10 @@ let _tokens: Token[] = [];
  * expressions based on logical operators and symbols (e.g., parentheses).
  * It identifies sections of the token list that represent WHERE clauses and
  * organizes the tokens into structured query tokens.
+ *
+ * Notes:
+ * - Combinator operators can bee seen as a substitute for the `OR` operator. Both are used to join/group expressions.
+ *      - However, later in the selector grouping/builder logic, combinators are treated as `AND` operators. This is due to the fact that only the `OR` operator is used to separate CSS selectors into groupings.
  *
  * @param tokens - The array of tokens to be processed.
  * @returns An array of query tokens representing the parsed expressions.
@@ -38,6 +43,19 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
             let _token = _tokens.shift();
 
             if (_token) {
+                /**
+                 * Remove leading operator. It's not needed, but makes writing convention easier to understand
+                 *
+                 * Ex. `SELECT * ... WITHIN TAG('a') AND WITHIN TAG('div')`
+                 *
+                 * VS
+                 *
+                 * `SELECT * ... WITHIN TAG('a') WITHIN TAG('div')`
+                 */
+                if (_tokens.length > 0 && isCombinatorOperator(_tokens[0].Value) && (_token.Value == OperatorType.AND || _token.Value == OperatorType.OR)) {
+                    _token = _tokens.shift() ?? _token;
+                }
+
                 operator = _token;
             }
         } else {
@@ -59,6 +77,21 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
             let token = _tokens.shift();
 
             if (!token) continue;
+
+            /**
+             * Remove leading operator. It's not needed, but makes writing convention easier to understand
+             *
+             * Ex. `SELECT * ... WITHIN TAG('a') AND WITHIN TAG('div')`
+             *
+             * VS
+             *
+             * `SELECT * ... WITHIN TAG('a') WITHIN TAG('div')`
+             */
+            if (_tokens.length > 0 && isCombinatorOperator(_tokens[0].Value) && (token.Value == OperatorType.AND || token.Value == OperatorType.OR)) {
+                token = _tokens.shift();
+
+                if (!token) continue;
+            }
 
             if (token.Type === TokenType.SYMBOL) {
                 if (token.Value == SymbolType.LPAREN && compoundExpression == null) {
@@ -85,12 +118,12 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
                         isArtificialCompound = true;
                     }
                 }
-            } else if (token?.Value == OperatorType.AND || token?.Value == OperatorType.OR) {
+            } else if (token?.Value == OperatorType.AND || isOrSubstitute(token)) {
                 if (expression) {
                     if (compoundExpression) {
                         /* Artificial Braces/Compound - Close off the compound */
-                        if (isArtificialCompound && (token.Value === OperatorType.OR || _tokens[0].Value == SymbolType.LPAREN)) {
-                            if (token.Value === OperatorType.OR) {
+                        if (isArtificialCompound && (isOrSubstitute(token) || _tokens[0].Value == SymbolType.LPAREN)) {
+                            if (isOrSubstitute(token)) {
                                 if (_tokens[0].Value != SymbolType.LPAREN) {
                                     // Artificially add brace for next compound query
                                     _tokens.unshift({

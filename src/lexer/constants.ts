@@ -29,12 +29,30 @@ const operators: { [key: string]: TokenType } = {
     [OperatorType.NOT]: TokenType.OPERATOR,
     [OperatorType.LIKE]: TokenType.OPERATOR,
     [OperatorType.CONTAINS]: TokenType.OPERATOR,
+    [OperatorType.CHILD]: TokenType.OPERATOR,
+    [OperatorType.SIBLING]: TokenType.OPERATOR,
+    [OperatorType.NEXT]: TokenType.OPERATOR,
+    [OperatorType.WITHIN]: TokenType.OPERATOR,
+    [OperatorType.OF]: TokenType.OPERATOR,
+    [OperatorType.TO]: TokenType.OPERATOR,
+    [OperatorType.CHILD_OF]: TokenType.OPERATOR,
+    [OperatorType.NEXT_TO]: TokenType.OPERATOR,
+    [OperatorType.SIBLING_OF]: TokenType.OPERATOR,
 } as const;
 
 const functions: { [key: string]: TokenType } = {
     [FunctionType.ATTRIBUTE]: TokenType.FUNCTION,
     [FunctionType.ATTR]: TokenType.FUNCTION,
+    [FunctionType.TAG]: TokenType.FUNCTION,
 };
+
+const tokenSequenceReplaceables: { [key: string]: OperatorType[] } = {
+    [OperatorType.CHILD_OF]: [OperatorType.CHILD, OperatorType.OF],
+    [OperatorType.NEXT_TO]: [OperatorType.NEXT, OperatorType.TO],
+    [OperatorType.SIBLING_OF]: [OperatorType.SIBLING, OperatorType.OF],
+};
+
+const orOperatorSubstitutes = [OperatorType.CHILD_OF, OperatorType.SIBLING_OF, OperatorType.NEXT_TO, OperatorType.WITHIN] as const;
 
 /** ------ Regex ------ */
 
@@ -48,4 +66,4 @@ const Regex = {
     function: /^\w+\s*\([^)]*\)/,
 };
 
-export { Regex, keywords, operators, functions };
+export { Regex, keywords, operators, functions, tokenSequenceReplaceables, orOperatorSubstitutes };

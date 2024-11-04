@@ -3,7 +3,7 @@ import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer
 import { keywordPriority } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
-import { getAttributeName, getSimpleOperationType } from './utilities';
+import { getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator, isValueToken } from './utilities';
 import { hasSecondaryOperator } from './validators';
 
 /**
@@ -42,7 +42,7 @@ function createSelectors(queryToken: QueryToken): SelectorGroup[] {
 /**
  * Groups selectors from multiple QueryTokens into a combined set of selector groups.
  * This function manages the merging of selectors based on their joining operators,
- * combining those joined by AND and separating those with other operators.
+ * combining those joined by `AND` or `combinator operators` and separating those with other operators.
  *
  * @param queryTokens - An array of QueryToken objects, each containing expressions and operators.
  * @returns An array of SelectorGroup objects, where each group represents a logical combination of selectors.
@@ -52,7 +52,7 @@ function groupSelectors(queryTokens: QueryToken[]): SelectorGroup[] {
 
     for (let i = 0; i < queryTokens.length; i++) {
         const queryGroupings = createSelectors(queryTokens[i]);
-        const lastGrouping = queryTokens[i].JoiningOperator === OperatorType.AND ? groupings.pop() : null;
+        const lastGrouping = queryTokens[i].JoiningOperator === OperatorType.AND || isCombinatorOperator(queryTokens[i].JoiningOperator) ? groupings.pop() : null;
 
         for (let j = 0; j < queryGroupings.length; j++) {
             groupings.push({
@@ -62,8 +62,21 @@ function groupSelectors(queryTokens: QueryToken[]): SelectorGroup[] {
     }
 
     for (let i = 0; i < groupings.length; i++) {
+        // Move combinator operators to the front of the group, but within 'OR' groupings
+        const combinatorSelectors = groupings[i].Selectors.filter(selector => isCombinatorOperator(selector.JoiningOperator)).reverse(); // Combinators next to each other should be in reverse order too
+        const otherSelectors = groupings[i].Selectors.filter(selector => !isCombinatorOperator(selector.JoiningOperator));
+
+        const orIdx = otherSelectors.findIndex(selector => selector.JoiningOperator === OperatorType.OR);
+
+        if (orIdx !== -1) {
+            groupings[i].Selectors = [...otherSelectors.slice(0, orIdx + 1), ...combinatorSelectors, ...otherSelectors.slice(orIdx + 1)];
+        } else {
+            groupings[i].Selectors = [...combinatorSelectors, ...otherSelectors];
+        }
+
+        // Now sort the non-combinator selectors within the group based on their keyword priority
         groupings[i].Selectors = groupings[i].Selectors.sort((a, b) => {
-            if (keywordPriority[a.KeywordType] && keywordPriority[b.KeywordType]) {
+            if (keywordPriority[a.KeywordType] && keywordPriority[b.KeywordType] && !isCombinatorOperator(a.JoiningOperator)) {
                 return keywordPriority[a.KeywordType] - keywordPriority[b.KeywordType];
             }
 
@@ -89,7 +102,7 @@ function generateQuery(groupings: SelectorGroup[]): string {
         let subQuery = '';
 
         for (let j = 0; j < groupings[i].Selectors.length; j++) {
-            subQuery += groupings[i].Selectors[j].Value;
+            subQuery += groupings[i].Selectors[j].Value + getCombinatorSeparator(groupings[i].Selectors[j].JoiningOperator);
         }
 
         query += i === 0 ? subQuery : `, ${subQuery}`;
@@ -109,20 +122,30 @@ function generateQuery(groupings: SelectorGroup[]): string {
  */
 function createSelector(expression: Expression): Selector {
     const keyword = expression.consumeToken(TokenType.KEYWORD, [TokenType.FUNCTION]);
-    const comparator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER, TokenType.SYMBOL]);
+    let comparator: Token | null = null;
+    let simpleComparatorType = OperationType.EQUALS;
     let secondaryOperator: Token | undefined;
 
-    if (expression.nextToken() && hasSecondaryOperator(comparator, expression.nextToken())) {
-        secondaryOperator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER]);
-    }
+    // Don't parse for comparator-less expressions. Ex. `...WHERE TAG('a')`
+    if (isValueToken(expression.nextToken()) == false && expression.nextToken()) {
+        comparator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER, TokenType.SYMBOL]);
 
-    const simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
+        if (expression.nextToken() && hasSecondaryOperator(comparator, expression.nextToken())) {
+            secondaryOperator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER]);
+        }
+
+        simpleComparatorType = getSimpleOperationType(comparator.Value, secondaryOperator?.Value ?? null);
+    }
 
     let basicSelector = '';
 
     if (keyword.Value === KeywordType.TAG || keyword.Value === KeywordType.ELEMENT) {
-        const valueToken = expression.consumeToken(TokenType.STRING);
-        basicSelector = valueToken.Value;
+        if (keyword.Type === TokenType.FUNCTION) {
+            basicSelector = keyword.Arguments?.[0] ?? '';
+        } else {
+            const valueToken = expression.consumeToken(TokenType.STRING);
+            basicSelector = valueToken.Value;
+        }
     } else if (keyword.Value === KeywordType.ID) {
         const valueToken = expression.consumeToken(TokenType.STRING, [TokenType.NUMERIC]);
         basicSelector = getIdSelector(keyword, simpleComparatorType, valueToken);
@@ -136,7 +159,7 @@ function createSelector(expression: Expression): Selector {
             alternateTypes = [TokenType.NUMERIC];
         }
 
-        const valueToken = expression.consumeToken(TokenType.STRING, alternateTypes);
+        const valueToken = isValueToken(expression.nextToken()) ? expression.consumeToken(TokenType.STRING, alternateTypes) : undefined;
 
         basicSelector = getAttributeSelector(keyword, simpleComparatorType, valueToken);
     } else {
@@ -164,9 +187,19 @@ function createSelector(expression: Expression): Selector {
  * @param valueToken - The token containing the attribute or style value.
  * @returns A string representing the attribute selector in CSS format.
  */
-function getAttributeSelector(keyword: Token, simpleComparatorType: OperationType, valueToken: Token): string {
-    if ((keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.ATTR) && keyword.Type !== TokenType.FUNCTION) {
-        return `[${valueToken.Value}]`;
+function getAttributeSelector(keyword: Token, simpleComparatorType: OperationType, valueToken: Token | undefined): string {
+    if (keyword.Value === KeywordType.ATTRIBUTE || keyword.Value === KeywordType.ATTR) {
+        if (keyword.Type !== TokenType.FUNCTION && valueToken) {
+            return `[${valueToken.Value}]`;
+        } else if (keyword.Type === TokenType.FUNCTION && !valueToken) {
+            return `[${keyword.Arguments?.[0] ?? ''}]`;
+        } else if (!valueToken) {
+            throw new Error(`Invalid attribute or style selector. Expected a value token, but none was provided.`);
+        }
+    }
+
+    if (!valueToken) {
+        throw new Error(`Invalid attribute or style selector. Expected a value token, but none was provided.`);
     }
 
     const attributeName = keyword.Type === TokenType.FUNCTION ? (keyword?.Arguments?.[0] ?? '') : getAttributeName(keyword);

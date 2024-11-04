@@ -1,6 +1,8 @@
-import { KeywordType, OperatorType, SymbolType, Token } from '@/lexer/types';
+import { orOperatorSubstitutes } from '@/lexer/constants';
+import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
-import { Expression, OperationType } from './types';
+import { combinatorSeparators } from './constants';
+import { Expression, JoiningOperatorType, OperationType } from './types';
 
 function getAttributeName(token: Token): string {
     switch (token.Value) {
@@ -26,8 +28,16 @@ function getSimpleOperationType(value: string, secondaryValue: string | null): O
         return OperationType.NOT_LIKE;
     } else if (value === OperatorType.CONTAINS) {
         return OperationType.CONTAINS;
-    } else if (value === OperatorType.NOT && secondaryValue === OperationType.CONTAINS) {
+    } else if (value === OperatorType.NOT && secondaryValue === OperatorType.CONTAINS) {
         return OperationType.NOT_CONTAINS;
+    } else if (value === OperatorType.CHILD && secondaryValue === OperatorType.OF) {
+        return OperationType.CHILD_OF;
+    } else if (value === OperatorType.SIBLING && secondaryValue === OperatorType.OF) {
+        return OperationType.SIBLING_OF;
+    } else if (value === OperatorType.NEXT && secondaryValue === OperatorType.TO) {
+        return OperationType.NEXT_TO;
+    } else if (value === OperatorType.WITHIN) {
+        return OperationType.WITHIN;
     }
 
     return OperationType.UNKNOWN;
@@ -58,4 +68,62 @@ function deepCopy<T>(obj: T): T {
     return copy;
 }
 
-export { getAttributeName, getSimpleOperationType, deepCopy };
+function isValueToken(token: Token | null): boolean {
+    if (!token) {
+        return false;
+    }
+
+    return token.Type === TokenType.STRING || token.Type === TokenType.NUMERIC;
+}
+
+/**
+ * Determines if the token is an OR operator or a substitute for an OR operator.
+ *
+ * @param token - The token to be evaluated.
+ * @returns `true` if the token is an OR operator or a substitute for an OR operator, otherwise, `false`.
+ */
+function isOrSubstitute(token: Token | null): boolean {
+    if (!token) {
+        return false;
+    }
+
+    if (token.Value == OperatorType.OR) {
+        return true;
+    } else if (isCombinatorOperator(token.Value)) {
+        return true;
+    }
+
+    return false;
+}
+
+function isCombinatorOperator(joiningOperator: JoiningOperatorType | string | null | undefined): boolean {
+    if (!joiningOperator) {
+        return false;
+    }
+
+    return orOperatorSubstitutes.some(x => x == joiningOperator);
+}
+
+function getCombinatorSeparator(joiningOperator: JoiningOperatorType | null | undefined): string {
+    if (!joiningOperator) {
+        return '';
+    }
+
+    let selector = combinatorSeparators[joiningOperator];
+
+    if (!selector) {
+        return '';
+    }
+
+    if (!selector.startsWith(' ')) {
+        selector = ` ${selector}`;
+    }
+
+    if (!selector.endsWith(' ')) {
+        selector += ' ';
+    }
+
+    return selector;
+}
+
+export { getAttributeName, getSimpleOperationType, deepCopy, isValueToken, isCombinatorOperator, isOrSubstitute, getCombinatorSeparator };

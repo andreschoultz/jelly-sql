@@ -157,7 +157,7 @@ SELECT * FROM DOM WHERE
 
 ```sql
 SELECT * FROM DOM WHERE
-    TAG('div') CHILD OF TAG('p')
+    TAG('p') CHILD OF TAG('div')
 OR  (TAG = 'span' AND CLASS = 'text-blue')
 ```
 

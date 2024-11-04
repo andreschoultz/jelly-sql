@@ -155,12 +155,7 @@ import { parser } from './parser';
  */
 
 const sqlDomQuery = `SELECT * FROM DOM WHERE
-    TAG = 'a'
-    AND (
-            CLASS = 'active'
-            OR CLASS = 'link'
-            OR ATTR <> 'disabled'
-        )
+TAG('p') WITHIN TAG('div')
 `;
 
 const lexerTokens = lexer(sqlDomQuery);

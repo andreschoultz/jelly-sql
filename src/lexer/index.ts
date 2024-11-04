@@ -1,4 +1,4 @@
-import { functions, keywords, operators, Regex } from './constants';
+import { functions, keywords, operators, Regex, tokenSequenceReplaceables } from './constants';
 import { Token, TokenType } from './types';
 
 function cleanToken(value: string): string {
@@ -133,6 +133,8 @@ function lexer(input: string): Token[] {
         seekPosition++;
     }
 
+    tokens = replaceTokenGroupings(tokens);
+
     return tokens;
 }
 
@@ -173,6 +175,54 @@ function tokenizeArguments(value: string): string[] {
     }
 
     return $arguments;
+}
+
+/**
+ * Replaces token groupings with their respective token.
+ *
+ * #### Example: `CHILD`, `OF` comes in as two operator tokens, but should be replaced with a single `CHILD OF` operator token.
+ *
+ * @param tokens - The tokens to be evaluated.
+ * @returns The tokens with the groupings replaced.
+ */
+function replaceTokenGroupings(tokens: Token[]): Token[] {
+    for (let i = 0; i < tokens.length; i++) {
+        let tokensCnt = tokens.length;
+
+        if (i >= tokensCnt + 1 || (i < tokensCnt + 1 && (tokens[i].Type != TokenType.OPERATOR || tokens[i + 1].Type != TokenType.OPERATOR))) {
+            continue;
+        }
+
+        let replacedTokens: Token[] = [];
+
+        for (const key in tokenSequenceReplaceables) {
+            const _operators = tokenSequenceReplaceables[key];
+
+            for (let x = 0; x < _operators.length; x++) {
+                const nextTokenIdx = i + x;
+
+                if (nextTokenIdx >= tokensCnt || _operators[x] != tokens[nextTokenIdx].Value) {
+                    replacedTokens = [];
+                    break;
+                }
+
+                replacedTokens.push(tokens[nextTokenIdx]);
+            }
+
+            if (replacedTokens.length > 0) {
+                const newToken: Token = {
+                    ...tokens[i],
+                    Value: key,
+                };
+
+                tokens.splice(i, replacedTokens.length, newToken);
+
+                break;
+            }
+        }
+    }
+
+    return tokens;
 }
 
 export { lexer };
