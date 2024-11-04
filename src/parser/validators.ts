@@ -1,6 +1,6 @@
 import { OperatorType, Token } from '@/lexer/types';
 
-function hasSecondaryOperator(operator: Token, nextToken: Token | null): Boolean {
+function hasSecondaryOperator(operator: Token, nextToken: Token | null): boolean {
     if (nextToken == null) return false;
 
     if (operator.Value === OperatorType.NOT) {

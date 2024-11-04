@@ -1,6 +1,8 @@
+import { orOperatorSubstitutes } from '@/lexer/constants';
 import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
-import { Expression, OperationType } from './types';
+import { combinatorSeparators } from './constants';
+import { Expression, JoiningOperatorType, OperationType } from './types';
 
 function getAttributeName(token: Token): string {
     switch (token.Value) {
@@ -74,4 +76,54 @@ function isValueToken(token: Token | null): boolean {
     return token.Type === TokenType.STRING || token.Type === TokenType.NUMERIC;
 }
 
-export { getAttributeName, getSimpleOperationType, deepCopy, isValueToken };
+/**
+ * Determines if the token is an OR operator or a substitute for an OR operator.
+ *
+ * @param token - The token to be evaluated.
+ * @returns `true` if the token is an OR operator or a substitute for an OR operator, otherwise, `false`.
+ */
+function isOrSubstitute(token: Token | null): boolean {
+    if (!token) {
+        return false;
+    }
+
+    if (token.Value == OperatorType.OR) {
+        return true;
+    } else if (isCombinatorOperator(token.Value)) {
+        return true;
+    }
+
+    return false;
+}
+
+function isCombinatorOperator(joiningOperator: JoiningOperatorType | string | null | undefined): boolean {
+    if (!joiningOperator) {
+        return false;
+    }
+
+    return orOperatorSubstitutes.some(x => x == joiningOperator);
+}
+
+function getCombinatorSeparator(joiningOperator: JoiningOperatorType | null | undefined): string {
+    if (!joiningOperator) {
+        return '';
+    }
+
+    let selector = combinatorSeparators[joiningOperator];
+
+    if (!selector) {
+        return '';
+    }
+
+    if (!selector.startsWith(' ')) {
+        selector = ` ${selector}`;
+    }
+
+    if (!selector.endsWith(' ')) {
+        selector += ' ';
+    }
+
+    return selector;
+}
+
+export { getAttributeName, getSimpleOperationType, deepCopy, isValueToken, isCombinatorOperator, isOrSubstitute, getCombinatorSeparator };

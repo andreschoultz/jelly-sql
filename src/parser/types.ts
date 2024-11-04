@@ -46,7 +46,7 @@ class Expression {
     }
 }
 
-type JoiningOperatorType = OperatorType.AND | OperatorType.OR;
+type JoiningOperatorType = OperatorType.AND | OperatorType.OR | OperatorType.WITHIN | OperatorType.CHILD_OF | OperatorType.SIBLING_OF | OperatorType.NEXT_TO;
 
 interface CompoundExpression {
     Expressions: Expression[];

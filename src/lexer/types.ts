@@ -43,6 +43,9 @@ enum OperatorType {
     WITHIN = 'WITHIN',
     OF = 'OF',
     TO = 'TO',
+    CHILD_OF = 'CHILD OF',
+    NEXT_TO = 'NEXT TO',
+    SIBLING_OF = 'SIBLING OF',
 }
 
 enum FunctionType {
@@ -76,6 +79,7 @@ enum SymbolType {
     DIVIDE = '/',
 
     PERCENT = '%',
+    TILDE = '~',
 
     ASSIGN = '=',
     AND = '&&',

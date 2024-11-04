@@ -37,8 +37,9 @@ Please see [Local Development](#Local-Development) for working with the source.
 - ~~Implement `:not()`~~
 - ~~Force tag selectors to front of query~~
 - ~~Resolve selectors duplicating with multiple un-grouped `OR` operators~~
-- (***Active***)Implement combinators, ex. ` `, `>`, `+`, `~`
-- (***Next***)Implement pseudo selectors
+- ~~Implement combinators, ex. ` `, `>`, `+`, `~`~~
+- (***Next***) Add support for nested groupings of `(...)`
+- (***Active***) Implement pseudo selectors
 - Improve type checking & syntax errors
 - ~~Unit testing~~
 - Support escaping characters?
