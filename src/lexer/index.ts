@@ -95,7 +95,7 @@ function lexer(input: string): Token[] {
         let operatorFound = false;
 
         for (const key in operators) {
-            if (rawToken.startsWith(key + ' ')) {
+            if (rawToken.toUpperCase().startsWith(key + ' ')) {
                 // Must have a space after it. Otherwise `<` can parse on a `<>`. *Should actually do a forward seek instead... or largest match wins?.
                 tokens.push({ Type: operators[key], Value: key });
 
