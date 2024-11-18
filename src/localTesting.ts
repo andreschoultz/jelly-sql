@@ -154,9 +154,7 @@ import { parser } from './parser';
     AND Attribute('data-color') = 'red'
  */
 
-const sqlDomQuery = `SELECT * FROM DOM WHERE
-TAG('p') WITHIN TAG('div')
-`;
+const sqlDomQuery = `SELECT * FROM DOM WHERE TAG = 'a' child of TAG = 'div' OR TAG = 'body' child of TAG <> 'a'`;
 
 const lexerTokens = lexer(sqlDomQuery);
 console.log('Lexer Tokens: ', lexerTokens);

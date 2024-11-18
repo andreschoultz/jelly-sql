@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { query } from '../../src/index';
+import { operators } from '../../src/lexer/constants';
 import { KeywordType, OperatorType, SymbolType } from '../../src/lexer/types';
 
 describe('QuerySelector Generator', () => {
@@ -61,6 +62,83 @@ describe('QuerySelector Generator', () => {
                         }
                     }
                 }
+            });
+
+            test('Combinators', () => {
+                const combinatorOperators = [
+                    {
+                        operators: [OperatorType.CHILD, OperatorType.OF],
+                        separator: ' > ',
+                    },
+                    {
+                        operators: [OperatorType.WITHIN],
+                        separator: ' ',
+                    },
+                    {
+                        operators: [OperatorType.NEXT, OperatorType.TO],
+                        separator: ' + ',
+                    },
+                    {
+                        operators: [OperatorType.SIBLING, OperatorType.OF],
+                        separator: ' ~ ',
+                    },
+                ];
+                const validKeywords = generateLowerCaseVariations(keywords);
+                const testCases = [
+                    { inputs: [`'a'`, `'div'`] },
+                    { inputs: [`'a'`, `'div'`, `'body'`] },
+                    { inputs: [`'span'`, `'a'`, `'div'`, `'body'`] },
+                    { inputs: [`'span'`, `'a'`, `'ul'`, `'div'`, `'body'`] },
+                    { inputs: [`'button'`, `'ul'`] },
+                    { inputs: [`'custom-html-tag'`, `'secondary-custom-html-tag'`] },
+                ];
+
+                function testWrapper(testAndSeparator: boolean, testAsFunction: boolean) {
+                    for (const keyword of validKeywords) {
+                        if (testAsFunction && keyword != KeywordType.TAG) continue;
+
+                        for (const combinator of combinatorOperators) {
+                            const validOperators = generateLowerCaseVariations([combinator.operators.join(' ')]);
+
+                            for (const operator of validOperators) {
+                                for (const { inputs } of testCases) {
+                                    let subQuery = '';
+
+                                    for (let i = 0; i < inputs.length; i++) {
+                                        if (testAsFunction) {
+                                            subQuery += `${keyword}(${inputs[i]})`;
+                                        } else {
+                                            subQuery += `${keyword} = ${inputs[i]}`;
+                                        }
+
+                                        if (testAndSeparator && i > 0 && i < inputs.length - 1) {
+                                            subQuery += ' AND ';
+                                        }
+
+                                        if (i + 1 < inputs.length) {
+                                            subQuery += ` ${operator} `;
+                                        }
+                                    }
+
+                                    subQuery = subQuery.trim();
+
+                                    const queryString = `SELECT * FROM DOM WHERE ${subQuery}`;
+                                    const expected = inputs
+                                        .map(x => x.replaceAll("'", ''))
+                                        .reverse()
+                                        .join(combinator.separator);
+
+                                    expect(query(queryString)).toBe(expected);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                testWrapper(false, false);
+                testWrapper(false, true);
+                testWrapper(true, false);
+                testWrapper(true, true);
             });
         });
 

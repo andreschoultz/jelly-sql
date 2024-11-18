@@ -122,7 +122,7 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
                 if (expression) {
                     if (compoundExpression) {
                         /* Artificial Braces/Compound - Close off the compound */
-                        if (isArtificialCompound && (isOrSubstitute(token) || _tokens[0].Value == SymbolType.LPAREN)) {
+                        if (isArtificialCompound && (token.Value == OperatorType.OR || _tokens[0].Value == SymbolType.LPAREN)) {
                             if (isOrSubstitute(token)) {
                                 if (_tokens[0].Value != SymbolType.LPAREN) {
                                     // Artificially add brace for next compound query
