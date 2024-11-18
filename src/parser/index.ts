@@ -1,4 +1,4 @@
-import { KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
+import { FunctionType, KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
 import { keywordPriority } from './constants';
 import { buildExpressions } from './expressionBuilder';
@@ -141,7 +141,7 @@ function createSelector(expression: Expression): Selector {
 
     if (keyword.Value === KeywordType.TAG || keyword.Value === KeywordType.ELEMENT) {
         if (keyword.Type === TokenType.FUNCTION) {
-            basicSelector = keyword.Arguments?.[0] ?? '';
+            basicSelector = keyword.Arguments?.[0].Value ?? '';
         } else {
             const valueToken = expression.consumeToken(TokenType.STRING);
             basicSelector = valueToken.Value;
@@ -162,6 +162,8 @@ function createSelector(expression: Expression): Selector {
         const valueToken = isValueToken(expression.nextToken()) ? expression.consumeToken(TokenType.STRING, alternateTypes) : undefined;
 
         basicSelector = getAttributeSelector(keyword, simpleComparatorType, valueToken);
+    } else if (keyword.Value === FunctionType.CHILD && keyword.Type === TokenType.FUNCTION) {
+        basicSelector = getStructuralPseudoSelector(keyword);
     } else {
         throw new Error(`Unable to handle foreign selector of type ${keyword.Value}.`);
     }
@@ -192,7 +194,7 @@ function getAttributeSelector(keyword: Token, simpleComparatorType: OperationTyp
         if (keyword.Type !== TokenType.FUNCTION && valueToken) {
             return `[${valueToken.Value}]`;
         } else if (keyword.Type === TokenType.FUNCTION && !valueToken) {
-            return `[${keyword.Arguments?.[0] ?? ''}]`;
+            return `[${keyword.Arguments?.[0].Value ?? ''}]`;
         } else if (!valueToken) {
             throw new Error(`Invalid attribute or style selector. Expected a value token, but none was provided.`);
         }
@@ -202,7 +204,7 @@ function getAttributeSelector(keyword: Token, simpleComparatorType: OperationTyp
         throw new Error(`Invalid attribute or style selector. Expected a value token, but none was provided.`);
     }
 
-    const attributeName = keyword.Type === TokenType.FUNCTION ? (keyword?.Arguments?.[0] ?? '') : getAttributeName(keyword);
+    const attributeName = keyword.Type === TokenType.FUNCTION ? (keyword?.Arguments?.[0].Value ?? '') : getAttributeName(keyword);
     let selector = '';
 
     switch (simpleComparatorType) {
@@ -287,6 +289,84 @@ function getClassSelector(keyword: Token, simpleComparatorType: OperationType, v
     } else {
         return getAttributeSelector(keyword, simpleComparatorType, valueToken);
     }
+}
+
+/**
+ * Generates a structural pseudo-class selector (e.g., `:nth-child`, `:only-child`, `:empty`)
+ * based on the provided token and its arguments.
+ *
+ * The function processes up to two arguments:
+ * - The first argument determines the type of selector (e.g., `first`, `last`, `odd`, `even`, etc.).
+ * - The second argument refines the nth-child expression if applicable (e.g., a numeric value or expression).
+ *
+ * @param keyword - The token representing the structural pseudo-class, which includes
+ *                  arguments defining its behavior.
+ * @returns A string representing the structural pseudo-class selector in CSS format.
+ *
+ * @throws An error if:
+ * - The token has no arguments or invalid arguments.
+ * - Unexpected argument types or values are provided.
+ * - Arguments fail to correspond to known pseudo-classes or valid nth-child expressions.
+ */
+function getStructuralPseudoSelector(keyword: Token): string {
+    let selector: string | undefined;
+
+    if (!keyword.Arguments || keyword.Arguments.length == 0) {
+        throw new Error(`Expected at least 1 argument for ${keyword.Type} of value ${keyword.Value}`);
+    }
+
+    let locationKeyword: KeywordType = KeywordType.FIRST;
+    let nthExpression: string | undefined;
+    const argument_1: Token = keyword.Arguments[0];
+    const argument_2: Token | undefined = keyword.Arguments.length > 1 ? keyword.Arguments[1] : undefined;
+
+    /* ------ 1st Argument */
+    if (argument_1.Type === TokenType.KEYWORD) {
+        if (argument_1.Value === KeywordType.FIRST || argument_1.Value === KeywordType.LAST) {
+            locationKeyword = KeywordType[argument_1.Value];
+        } else if (argument_1.Value === KeywordType.ODD || argument_1.Value === KeywordType.EVEN) {
+            nthExpression = argument_1.Value;
+        } else if (argument_1.Value === KeywordType.ONLY) {
+            selector = 'only-child';
+        } else if (argument_1.Value === KeywordType.EMPTY) {
+            selector = 'empty';
+        }
+    } else if (argument_1.Type === TokenType.EXPRESSION || argument_1.Type === TokenType.NUMERIC) {
+        nthExpression = argument_1.Value;
+    } else if (argument_1) {
+        throw new Error(
+            `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${keyword.Type} ${keyword.Value}, but got ${argument_1.Type} of value ${argument_1.Value}.`
+        );
+    }
+
+    /* ------ 2nd Argument ------ */
+    if (argument_2?.Type === TokenType.KEYWORD) {
+        if (argument_2.Value === KeywordType.ODD || argument_2.Value === KeywordType.EVEN) {
+            nthExpression = argument_2.Value;
+        } else {
+            throw new Error(`Expected keyword of type ${KeywordType.ODD} or ${KeywordType.EVEN} for ${keyword.Type} ${keyword.Value}, but got ${argument_2.Value} instead.`);
+        }
+    } else if (argument_2?.Type === TokenType.EXPRESSION || argument_2?.Type === TokenType.NUMERIC) {
+        nthExpression = argument_2.Value;
+    } else if (argument_2) {
+        throw new Error(
+            `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${keyword.Type} ${keyword.Value}, but got ${argument_2.Type} of value ${argument_2.Value}.`
+        );
+    }
+
+    if (selector) {
+        return `:${selector}`;
+    }
+
+    /* ------ Final assembly ------ */
+    if (nthExpression) {
+        nthExpression = nthExpression.replaceAll(' ', '');
+        selector = `nth` + (locationKeyword === KeywordType.FIRST ? '' : `-${KeywordType.LAST.toLowerCase()}`) + `-child(${nthExpression})`;
+    } else {
+        selector = `${locationKeyword.toLowerCase()}-child`;
+    }
+
+    return `:${selector}`;
 }
 
 /**

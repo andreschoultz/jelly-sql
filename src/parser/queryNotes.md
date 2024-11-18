@@ -259,7 +259,7 @@ Ex.
 ```sql
 CHILD(2N) -- 2N, 2N+1, 3N-1, 3N-2
 
-CHILD(ODD) -- ODD, FIRST
+CHILD(ODD) -- ODD, EVEN
 ```
 
 ##### Location + `n-th` Selector: `:nth-last-child(n)`, `:nth-child(n)`

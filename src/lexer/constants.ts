@@ -14,6 +14,14 @@ const keywords: { [key: string]: TokenType } = {
     [KeywordType.ATTRIBUTE]: TokenType.KEYWORD,
     [KeywordType.ATTR]: TokenType.KEYWORD,
     [KeywordType.STYLE]: TokenType.KEYWORD,
+
+    /* Pseudo Selectors */
+    [KeywordType.FIRST]: TokenType.KEYWORD,
+    [KeywordType.LAST]: TokenType.KEYWORD,
+    [KeywordType.ODD]: TokenType.KEYWORD,
+    [KeywordType.EVEN]: TokenType.KEYWORD,
+    [KeywordType.ONLY]: TokenType.KEYWORD,
+    [KeywordType.EMPTY]: TokenType.KEYWORD,
 } as const;
 
 const operators: { [key: string]: TokenType } = {
@@ -44,6 +52,7 @@ const functions: { [key: string]: TokenType } = {
     [FunctionType.ATTRIBUTE]: TokenType.FUNCTION,
     [FunctionType.ATTR]: TokenType.FUNCTION,
     [FunctionType.TAG]: TokenType.FUNCTION,
+    [FunctionType.CHILD]: TokenType.FUNCTION,
 };
 
 const tokenSequenceReplaceables: { [key: string]: OperatorType[] } = {
@@ -64,6 +73,7 @@ const Regex = {
     comment: /^(--[^\n]*|\/\*[\s\S]*?\*\/)/,
     symbol: /^[,;()]/,
     function: /^\w+\s*\([^)]*\)/,
+    expression: /^[+-]?\s*\d*\s*N\s*(?:[+-]\s*\d+)?$|^[+-]?\s*\d+$|^\s*n\s*/,
 };
 
 export { Regex, keywords, operators, functions, tokenSequenceReplaceables, orOperatorSubstitutes };
