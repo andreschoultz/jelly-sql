@@ -1,5 +1,5 @@
 import { functions, keywords, operators, Regex, tokenSequenceReplaceables } from './constants';
-import { Token, TokenType } from './types';
+import { SymbolType, Token, TokenType } from './types';
 
 function cleanToken(value: string): string {
     if (value.startsWith("'")) value = value.substring(1);
@@ -64,6 +64,10 @@ function lexer(input: string): Token[] {
         }
 
         if (pushRegexToken(rawToken.match(Regex.symbol), TokenType.SYMBOL)) {
+            continue;
+        }
+
+        if (pushRegexToken(rawToken.toUpperCase().match(Regex.expression), TokenType.EXPRESSION)) {
             continue;
         }
 
@@ -138,43 +142,8 @@ function lexer(input: string): Token[] {
     return tokens;
 }
 
-function tokenizeArguments(value: string): string[] {
-    let $arguments: string[] = [];
-    let seekPosition = 0;
-
-    function consumeArgument(match: RegExpMatchArray | null): boolean {
-        if (!match?.[0]) {
-            return false;
-        }
-
-        $arguments.push(cleanToken(match?.[0]));
-        seekPosition += match?.[0].length;
-
-        return true;
-    }
-
-    while (seekPosition < value.length) {
-        /* ------ Whitespace ------ */
-        let match = value.match(Regex.whitespace);
-
-        if (match?.[0]) {
-            seekPosition += match?.[0].length;
-        }
-
-        /* ------ String ------ */
-        if (consumeArgument(value.match(Regex.string))) {
-            continue;
-        }
-
-        /* ------ Numeric ------ */
-        if (consumeArgument(value.match(Regex.numeric))) {
-            continue;
-        }
-
-        seekPosition++; // Will handle any commas and misc. wandering characters. Stricter validation should be put in place.
-    }
-
-    return $arguments;
+function tokenizeArguments(value: string): Token[] {
+    return lexer(value).filter(x => !(x.Type == TokenType.SYMBOL && x.Value == SymbolType.COMMA));
 }
 
 /**

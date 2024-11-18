@@ -227,3 +227,98 @@ OR  (Attribute('data-color') WITHIN TAG('div'))
 OR  ((TAG = 'span' AND CLASS = 'text-blue') NEXT TO TAG('p') AND WITHIN TAG('div') AND CHILD OF TAG('div'))
 OR  (TAG('p') SIBLING OF TAG('div'))
 ```
+
+## Pseudo Selectors
+
+### Structural
+
+#### Proposed functions
+
+##### Location: `:first-child`, `:last-child`
+
+```sql
+CHILD({location-keyword})
+```
+
+Ex.
+
+```sql
+CHILD(FIRST) -- FIRST, LAST
+```
+
+##### `n-th` Selector: `:nth-child(n)`
+
+```sql
+CHILD({nth-sum})
+
+CHILD({nth-keyword})
+```
+
+Ex.
+
+```sql
+CHILD(2N) -- 2N, 2N+1, 3N-1, 3N-2
+
+CHILD(ODD) -- ODD, EVEN
+```
+
+##### Location + `n-th` Selector: `:nth-last-child(n)`, `:nth-child(n)`
+
+```sql
+CHILD({location-keyword}, {nth-sum})
+
+CHILD({location-keyword}, {nth-keyword})
+```
+
+Ex.
+
+```sql
+CHILD(FIRST, 2N+1) -- Same as CHILD(2N+1)
+
+CHILD(LAST, 2N+1)
+__
+
+CHILD(FIRST, ODD) -- Same as CHILD(ODD)
+
+CHILD(LAST, ODD)
+```
+
+##### Keyword: `:only-child`, `:empty`
+
+```sql
+CHILD({keyword})
+```
+
+Ex.
+
+```sql
+CHILD(ONLY) -- ONLY, EMPTY
+```
+
+##### `of-type` Selector: `:nth-of-type(n)`, `:nth-last-of-type(n)`, `:first-of-type`, `:last-of-type`, `:only-of-type`
+
+```sql
+CHILD() AS TYPEOF
+
+CHILD({location-keyword}) AS TYPEOF
+
+CHILD({nth-keyword}) AS TYPEOF
+
+CHILD({location-keyword}, {nth-keyword}) AS TYPEOF
+
+CHILD({keyword}) AS TYPEOF
+```
+
+Ex.
+
+```sql
+CHILD() AS TYPEOF -- Same as CHILD(FIRST) AS TYPEOF
+
+CHILD(LAST) AS TYPEOF
+
+CHILD(2N+1) AS TYPEOF -- Same as CHILD(FIRST, 2N+1) AS TYPEOF
+
+CHILD(LAST, 2N+1) AS TYPEOF
+
+CHILD(ONLY) AS TYPEOF
+```

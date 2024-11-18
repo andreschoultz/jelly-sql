@@ -38,10 +38,11 @@ Please see [Local Development](#Local-Development) for working with the source.
 - ~~Force tag selectors to front of query~~
 - ~~Resolve selectors duplicating with multiple un-grouped `OR` operators~~
 - ~~Implement combinators, ex. ` `, `>`, `+`, `~`~~
-- (***Next***) Add support for nested groupings of `(...)`
+- Add support for nested groupings of `(...)`
 - (***Active***) Implement pseudo selectors
 - Improve type checking & syntax errors
 - ~~Unit testing~~
+- (***Next***) Comments with `--`
 - Support escaping characters?
 
 ## Local Development

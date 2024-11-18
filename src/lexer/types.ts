@@ -3,6 +3,7 @@ enum TokenType {
     IDENTIFIER = 'IDENTIFIER',
     OPERATOR = 'OPERATOR',
     FUNCTION = 'FUNCTION',
+    EXPRESSION = 'EXPRESSION',
 
     STRING = 'STRING',
     NUMERIC = 'NUMERIC',
@@ -26,6 +27,14 @@ enum KeywordType {
     ATTRIBUTE = 'ATTRIBUTE', // ATTRIBUTE == ATR
     ATTR = 'ATTR', // ATR == ATTRIBUTE
     STYLE = 'STYLE',
+
+    /* Pseudo Selectors */
+    FIRST = 'FIRST',
+    LAST = 'LAST',
+    ODD = 'ODD',
+    EVEN = 'EVEN',
+    ONLY = 'ONLY',
+    EMPTY = 'EMPTY',
 }
 
 enum OperatorType {
@@ -52,6 +61,8 @@ enum FunctionType {
     ATTRIBUTE = 'ATTRIBUTE', // ATTRIBUTE == ATR
     ATTR = 'ATTR', // ATR == ATTRIBUTE
     TAG = 'TAG',
+    CHILD = 'CHILD',
+    TYPEOF = 'TYPEOF', // Equal representation for the `of-type` in structural pseudo selectors
 }
 
 enum CompoundType {
@@ -97,7 +108,7 @@ interface Token {
     Type: TokenType;
     Value: string;
     Field?: string | null;
-    Arguments?: string[] | null;
+    Arguments?: Token[] | null;
 }
 
 interface TokenIdentifier {
