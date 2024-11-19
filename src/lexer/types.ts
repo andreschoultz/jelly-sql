@@ -29,13 +29,34 @@ enum KeywordType {
     ATTR = 'ATTR', // ATR == ATTRIBUTE
     STYLE = 'STYLE',
 
-    /* Pseudo Selectors */
+    /* Pseudo Selectors - Structural */
     FIRST = 'FIRST',
     LAST = 'LAST',
     ODD = 'ODD',
     EVEN = 'EVEN',
     ONLY = 'ONLY',
     EMPTY = 'EMPTY',
+
+    /* Pseudo Selectors - Link */
+    LINK = 'LINK',
+    VISITED = 'VISITED',
+
+    /* Pseudo Selectors - User Action */
+    ACTIVE = 'ACTIVE',
+    HOVER = 'HOVER',
+    FOCUS = 'FOCUS',
+
+    /* Pseudo Selectors - UI Element */
+    ENABLED = 'ENABLED',
+    DISABLED = 'DISABLED',
+    CHECKED = 'CHECKED',
+
+    /* Pseudo Selectors - Misc */
+    FIRSTLINE = 'FIRSTLINE',
+    FIRSTLETTER = 'FIRSTLETTER',
+    TARGET = 'TARGET',
+    BEFORE = 'BEFORE',
+    AFTER = 'AFTER',
 }
 
 enum OperatorType {

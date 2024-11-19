@@ -1,6 +1,6 @@
 import { FunctionType, KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
-import { keywordPriority } from './constants';
+import { keywordPriority, pseudoKeywordSelector } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
 import { getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator, isValueToken } from './utilities';
@@ -171,6 +171,8 @@ function createSelector(expression: Expression): Selector {
         }
 
         basicSelector = getStructuralPseudoSelector(keyword, operationFunction);
+    } else if (keyword.Value === FunctionType.TYPEOF && keyword.Type === TokenType.FUNCTION) {
+        basicSelector = getPseudoSelector(keyword);
     } else {
         throw new Error(`Unable to handle foreign selector of type ${keyword.Value}.`);
     }
@@ -306,7 +308,7 @@ function getClassSelector(keyword: Token, simpleComparatorType: OperationType, v
  * - The first argument determines the type of selector (e.g., `first`, `last`, `odd`, `even`, etc.).
  * - The second argument refines the nth-child expression if applicable (e.g., a numeric value or expression).
  *
- * @param keyword - The token representing the structural pseudo-class, which includes
+ * @param $function - The token representing the structural pseudo-class, which includes
  *                  arguments defining its behavior.
  * @param operationFunction - The token representing the operation function (e.g., `of-type`).
  * @returns A string representing the structural pseudo-class selector in CSS format.
@@ -316,7 +318,7 @@ function getClassSelector(keyword: Token, simpleComparatorType: OperationType, v
  * - Unexpected argument types or values are provided.
  * - Arguments fail to correspond to known pseudo-classes or valid nth-child expressions.
  */
-function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | undefined): string {
+function getStructuralPseudoSelector($function: Token, operationFunction: Token | undefined): string {
     let selector: string | undefined;
 
     if (operationFunction && operationFunction.Value != FunctionType.TYPEOF) {
@@ -325,12 +327,12 @@ function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | 
 
     let locationKeyword: KeywordType = KeywordType.FIRST;
     let nthExpression: string | undefined;
-    const argument_1: Token | undefined = keyword.Arguments && keyword.Arguments.length > 0 ? keyword.Arguments[0] : undefined;
-    const argument_2: Token | undefined = keyword.Arguments && keyword.Arguments?.length > 1 ? keyword.Arguments[1] : undefined;
+    const argument_1: Token | undefined = $function.Arguments && $function.Arguments.length > 0 ? $function.Arguments[0] : undefined;
+    const argument_2: Token | undefined = $function.Arguments && $function.Arguments?.length > 1 ? $function.Arguments[1] : undefined;
     const pseudoSelectorFunction = operationFunction ? 'of-type' : 'child';
 
     const getWrongArgumentErrorMsg = (argument: Token) =>
-        `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${keyword.Type} ${keyword.Value}, but got ${argument.Type} of value ${argument.Value}.`;
+        `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${$function.Type} ${$function.Value}, but got ${argument.Type} of value ${argument.Value}.`;
 
     /* ------ 1st Argument */
 
@@ -355,7 +357,7 @@ function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | 
         if (argument_2.Value === KeywordType.ODD || argument_2.Value === KeywordType.EVEN) {
             nthExpression = argument_2.Value;
         } else {
-            throw new Error(`Expected keyword of type ${KeywordType.ODD} or ${KeywordType.EVEN} for ${keyword.Type} ${keyword.Value}, but got ${argument_2.Value} instead.`);
+            throw new Error(`Expected keyword of type ${KeywordType.ODD} or ${KeywordType.EVEN} for ${$function.Type} ${$function.Value}, but got ${argument_2.Value} instead.`);
         }
     } else if (argument_2?.Type === TokenType.EXPRESSION || argument_2?.Type === TokenType.NUMERIC) {
         nthExpression = argument_2.Value;
@@ -373,6 +375,24 @@ function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | 
         selector = `nth` + (locationKeyword === KeywordType.FIRST ? '' : `-${KeywordType.LAST.toLowerCase()}`) + `-${pseudoSelectorFunction}(${nthExpression})`;
     } else {
         selector = `${locationKeyword.toLowerCase()}-${pseudoSelectorFunction}`;
+    }
+
+    return `:${selector}`;
+}
+
+function getPseudoSelector($function: Token): string {
+    if (!$function.Arguments || $function.Arguments.length == 0) {
+        throw new Error(`Expected at least 1 argument for ${$function.Type} of value ${$function.Value}`);
+    }
+
+    let selector = pseudoKeywordSelector[$function.Arguments[0].Value];
+
+    if (!selector) {
+        throw new Error(`Expected a valid pseudo selector, but got ${$function.Arguments[0].Value} instead`);
+    }
+
+    if ([KeywordType.FIRSTLINE, KeywordType.FIRSTLETTER, KeywordType.BEFORE, KeywordType.AFTER].some(x => x === selector)) {
+        selector = `:${selector}`;
     }
 
     return `:${selector}`;

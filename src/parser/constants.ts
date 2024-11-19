@@ -16,4 +16,20 @@ const combinatorSeparators: { [key: string]: string } = {
     [OperatorType.SIBLING_OF]: SymbolType.TILDE,
 } as const;
 
-export { keywordPriority, combinatorSeparators };
+const pseudoKeywordSelector: { [key: string]: string } = {
+    [KeywordType.LINK]: 'link',
+    [KeywordType.VISITED]: 'visited',
+    [KeywordType.ACTIVE]: 'active',
+    [KeywordType.HOVER]: 'hover',
+    [KeywordType.FOCUS]: 'focus',
+    [KeywordType.ENABLED]: 'enabled',
+    [KeywordType.DISABLED]: 'disabled',
+    [KeywordType.CHECKED]: 'checked',
+    [KeywordType.FIRSTLINE]: 'first-line',
+    [KeywordType.FIRSTLETTER]: 'first-letter',
+    [KeywordType.TARGET]: 'target',
+    [KeywordType.BEFORE]: 'before',
+    [KeywordType.AFTER]: 'after',
+} as const;
+
+export { keywordPriority, combinatorSeparators, pseudoKeywordSelector };

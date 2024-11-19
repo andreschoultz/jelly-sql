@@ -16,13 +16,34 @@ const keywords: { [key: string]: TokenType } = {
     [KeywordType.ATTR]: TokenType.KEYWORD,
     [KeywordType.STYLE]: TokenType.KEYWORD,
 
-    /* Pseudo Selectors */
+    /* Pseudo Selectors - Structural */
     [KeywordType.FIRST]: TokenType.KEYWORD,
     [KeywordType.LAST]: TokenType.KEYWORD,
     [KeywordType.ODD]: TokenType.KEYWORD,
     [KeywordType.EVEN]: TokenType.KEYWORD,
     [KeywordType.ONLY]: TokenType.KEYWORD,
     [KeywordType.EMPTY]: TokenType.KEYWORD,
+
+    /* Pseudo Selectors - Link */
+    [KeywordType.LINK]: TokenType.KEYWORD,
+    [KeywordType.VISITED]: TokenType.KEYWORD,
+
+    /* Pseudo Selectors - User Action */
+    [KeywordType.ACTIVE]: TokenType.KEYWORD,
+    [KeywordType.HOVER]: TokenType.KEYWORD,
+    [KeywordType.FOCUS]: TokenType.KEYWORD,
+
+    /* Pseudo Selectors - UI Element */
+    [KeywordType.ENABLED]: TokenType.KEYWORD,
+    [KeywordType.DISABLED]: TokenType.KEYWORD,
+    [KeywordType.CHECKED]: TokenType.KEYWORD,
+
+    /* Pseudo Selectors - Misc */
+    [KeywordType.FIRSTLINE]: TokenType.KEYWORD,
+    [KeywordType.FIRSTLETTER]: TokenType.KEYWORD,
+    [KeywordType.TARGET]: TokenType.KEYWORD,
+    [KeywordType.BEFORE]: TokenType.KEYWORD,
+    [KeywordType.AFTER]: TokenType.KEYWORD,
 } as const;
 
 const operators: { [key: string]: TokenType } = {
@@ -54,6 +75,7 @@ const functions: { [key: string]: TokenType } = {
     [FunctionType.ATTR]: TokenType.FUNCTION,
     [FunctionType.TAG]: TokenType.FUNCTION,
     [FunctionType.CHILD]: TokenType.FUNCTION,
+    [FunctionType.TYPEOF]: TokenType.FUNCTION,
 };
 
 const standaloneFunctions: { [key: string]: TokenType } = {
