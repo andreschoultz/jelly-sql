@@ -104,6 +104,7 @@ const Regex = {
     symbol: /^[,;()]/,
     function: /^\w+\s*\([^)]*\)/,
     expression: /^[+-]?\s*\d*\s*N\s*(?:[+-]\s*\d+)?$|^[+-]?\s*\d+$|^\s*n\s*/,
+    comments: /^(--.*)|(((\/\*)+?[\w\W]+?(\*\/)+))/, // From [Remove SQL Comments by Mohinesh Patil](https://www.regexr.com/3gcrs)
 };
 
 export { Regex, keywords, operators, functions, standaloneFunctions, tokenSequenceReplaceables, orOperatorSubstitutes };
