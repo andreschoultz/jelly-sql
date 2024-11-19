@@ -1,6 +1,6 @@
 import { FunctionType, KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
 
-import { keywordPriority } from './constants';
+import { keywordPriority, pseudoKeywordSelector } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
 import { getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator, isValueToken } from './utilities';
@@ -171,6 +171,10 @@ function createSelector(expression: Expression): Selector {
         }
 
         basicSelector = getStructuralPseudoSelector(keyword, operationFunction);
+    } else if (keyword.Value === FunctionType.TYPEOF && keyword.Type === TokenType.FUNCTION) {
+        basicSelector = getGenericPseudoSelector(keyword);
+    } else if ((keyword.Value === FunctionType.LANGUAGE || keyword.Value === FunctionType.LANG) && keyword.Type === TokenType.FUNCTION) {
+        basicSelector = getLanguagePseudoSelector(keyword);
     } else {
         throw new Error(`Unable to handle foreign selector of type ${keyword.Value}.`);
     }
@@ -306,7 +310,7 @@ function getClassSelector(keyword: Token, simpleComparatorType: OperationType, v
  * - The first argument determines the type of selector (e.g., `first`, `last`, `odd`, `even`, etc.).
  * - The second argument refines the nth-child expression if applicable (e.g., a numeric value or expression).
  *
- * @param keyword - The token representing the structural pseudo-class, which includes
+ * @param $function - The token representing the structural pseudo-class, which includes
  *                  arguments defining its behavior.
  * @param operationFunction - The token representing the operation function (e.g., `of-type`).
  * @returns A string representing the structural pseudo-class selector in CSS format.
@@ -316,7 +320,7 @@ function getClassSelector(keyword: Token, simpleComparatorType: OperationType, v
  * - Unexpected argument types or values are provided.
  * - Arguments fail to correspond to known pseudo-classes or valid nth-child expressions.
  */
-function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | undefined): string {
+function getStructuralPseudoSelector($function: Token, operationFunction: Token | undefined): string {
     let selector: string | undefined;
 
     if (operationFunction && operationFunction.Value != FunctionType.TYPEOF) {
@@ -325,12 +329,12 @@ function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | 
 
     let locationKeyword: KeywordType = KeywordType.FIRST;
     let nthExpression: string | undefined;
-    const argument_1: Token | undefined = keyword.Arguments && keyword.Arguments.length > 0 ? keyword.Arguments[0] : undefined;
-    const argument_2: Token | undefined = keyword.Arguments && keyword.Arguments?.length > 1 ? keyword.Arguments[1] : undefined;
+    const argument_1: Token | undefined = $function.Arguments && $function.Arguments.length > 0 ? $function.Arguments[0] : undefined;
+    const argument_2: Token | undefined = $function.Arguments && $function.Arguments?.length > 1 ? $function.Arguments[1] : undefined;
     const pseudoSelectorFunction = operationFunction ? 'of-type' : 'child';
 
     const getWrongArgumentErrorMsg = (argument: Token) =>
-        `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${keyword.Type} ${keyword.Value}, but got ${argument.Type} of value ${argument.Value}.`;
+        `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${$function.Type} ${$function.Value}, but got ${argument.Type} of value ${argument.Value}.`;
 
     /* ------ 1st Argument */
 
@@ -343,6 +347,8 @@ function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | 
             selector = `only-${pseudoSelectorFunction}`;
         } else if (argument_1.Value === KeywordType.EMPTY) {
             selector = 'empty';
+        } else if (argument_1.Value === KeywordType.ROOT) {
+            selector = 'root';
         }
     } else if (argument_1?.Type === TokenType.EXPRESSION || argument_1?.Type === TokenType.NUMERIC) {
         nthExpression = argument_1.Value;
@@ -355,7 +361,7 @@ function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | 
         if (argument_2.Value === KeywordType.ODD || argument_2.Value === KeywordType.EVEN) {
             nthExpression = argument_2.Value;
         } else {
-            throw new Error(`Expected keyword of type ${KeywordType.ODD} or ${KeywordType.EVEN} for ${keyword.Type} ${keyword.Value}, but got ${argument_2.Value} instead.`);
+            throw new Error(`Expected keyword of type ${KeywordType.ODD} or ${KeywordType.EVEN} for ${$function.Type} ${$function.Value}, but got ${argument_2.Value} instead.`);
         }
     } else if (argument_2?.Type === TokenType.EXPRESSION || argument_2?.Type === TokenType.NUMERIC) {
         nthExpression = argument_2.Value;
@@ -376,6 +382,57 @@ function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | 
     }
 
     return `:${selector}`;
+}
+
+/**
+ * Generates a generic pseudo-class or pseudo-element selector based on the function token provided.
+ * Handles selectors like `:before`, `:after`, `:first-line`, and `:first-letter`.
+ *
+ * @param $function - The token representing the pseudo-class or pseudo-element function.
+ *                    It must include arguments defining the specific pseudo selector.
+ * @returns A string representing the pseudo-class or pseudo-element in CSS format.
+ *
+ * @throws An error if:
+ * - No arguments are provided for the function.
+ * - The argument does not map to a valid pseudo selector.
+ */
+function getGenericPseudoSelector($function: Token): string {
+    if (!$function.Arguments || $function.Arguments.length == 0) {
+        throw new Error(`Expected at least 1 argument for ${$function.Type} of value ${$function.Value}`);
+    }
+
+    let selector = pseudoKeywordSelector[$function.Arguments[0].Value];
+
+    if (!selector) {
+        throw new Error(`Expected a valid pseudo selector, but got ${$function.Arguments[0].Value} instead`);
+    }
+
+    if ([KeywordType.FIRSTLINE, KeywordType.FIRSTLETTER, KeywordType.BEFORE, KeywordType.AFTER].some(x => x === $function.Arguments?.[0].Value)) {
+        selector = `:${selector}`;
+    }
+
+    return `:${selector}`;
+}
+
+/**
+ * Generates a `:lang()` pseudo-class selector to match elements based on their language attribute.
+ *
+ * @param $function - The token representing the `:lang()` pseudo-class function.
+ *                    It must include a single argument specifying the language.
+ * @returns A string representing the `:lang()` pseudo-class in CSS format.
+ *
+ * @throws An error if:
+ * - No arguments are provided for the function.
+ * - The argument is not of type `string`.
+ */
+function getLanguagePseudoSelector($function: Token): string {
+    if (!$function.Arguments || $function.Arguments.length == 0) {
+        throw new Error(`Expected at least 1 argument for ${$function.Type} of value ${$function.Value}`);
+    } else if ($function.Arguments[0].Type != TokenType.STRING) {
+        throw new Error(`Expected a language of type string, but got ${$function.Arguments[0].Type} of value ${$function.Arguments[0].Value}`);
+    }
+
+    return `:lang(${$function.Arguments[0].Value.trim()})`;
 }
 
 /**

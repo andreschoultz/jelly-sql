@@ -39,10 +39,10 @@ Please see [Local Development](#Local-Development) for working with the source.
 - ~~Resolve selectors duplicating with multiple un-grouped `OR` operators~~
 - ~~Implement combinators, ex. ` `, `>`, `+`, `~`~~
 - Add support for nested groupings of `(...)`
-- (***Active***) Implement pseudo selectors
-- Improve type checking & syntax errors
+- ~~Implement pseudo selectors~~
+- (***Next***) Improve type checking & syntax errors
 - ~~Unit testing~~
-- (***Next***) Comments with `--`
+- (***Active***) Comments with `--`
 - Support escaping characters?
 
 ## Local Development
