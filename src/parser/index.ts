@@ -172,7 +172,9 @@ function createSelector(expression: Expression): Selector {
 
         basicSelector = getStructuralPseudoSelector(keyword, operationFunction);
     } else if (keyword.Value === FunctionType.TYPEOF && keyword.Type === TokenType.FUNCTION) {
-        basicSelector = getPseudoSelector(keyword);
+        basicSelector = getGenericPseudoSelector(keyword);
+    } else if ((keyword.Value === FunctionType.LANGUAGE || keyword.Value === FunctionType.LANG) && keyword.Type === TokenType.FUNCTION) {
+        basicSelector = getLanguagePseudoSelector(keyword);
     } else {
         throw new Error(`Unable to handle foreign selector of type ${keyword.Value}.`);
     }
@@ -380,7 +382,19 @@ function getStructuralPseudoSelector($function: Token, operationFunction: Token 
     return `:${selector}`;
 }
 
-function getPseudoSelector($function: Token): string {
+/**
+ * Generates a generic pseudo-class or pseudo-element selector based on the function token provided.
+ * Handles selectors like `:before`, `:after`, `:first-line`, and `:first-letter`.
+ *
+ * @param $function - The token representing the pseudo-class or pseudo-element function.
+ *                    It must include arguments defining the specific pseudo selector.
+ * @returns A string representing the pseudo-class or pseudo-element in CSS format.
+ *
+ * @throws An error if:
+ * - No arguments are provided for the function.
+ * - The argument does not map to a valid pseudo selector.
+ */
+function getGenericPseudoSelector($function: Token): string {
     if (!$function.Arguments || $function.Arguments.length == 0) {
         throw new Error(`Expected at least 1 argument for ${$function.Type} of value ${$function.Value}`);
     }
@@ -391,11 +405,32 @@ function getPseudoSelector($function: Token): string {
         throw new Error(`Expected a valid pseudo selector, but got ${$function.Arguments[0].Value} instead`);
     }
 
-    if ([KeywordType.FIRSTLINE, KeywordType.FIRSTLETTER, KeywordType.BEFORE, KeywordType.AFTER].some(x => x === selector)) {
+    if ([KeywordType.FIRSTLINE, KeywordType.FIRSTLETTER, KeywordType.BEFORE, KeywordType.AFTER].some(x => x === $function.Arguments?.[0].Value)) {
         selector = `:${selector}`;
     }
 
     return `:${selector}`;
+}
+
+/**
+ * Generates a `:lang()` pseudo-class selector to match elements based on their language attribute.
+ *
+ * @param $function - The token representing the `:lang()` pseudo-class function.
+ *                    It must include a single argument specifying the language.
+ * @returns A string representing the `:lang()` pseudo-class in CSS format.
+ *
+ * @throws An error if:
+ * - No arguments are provided for the function.
+ * - The argument is not of type `string`.
+ */
+function getLanguagePseudoSelector($function: Token): string {
+    if (!$function.Arguments || $function.Arguments.length == 0) {
+        throw new Error(`Expected at least 1 argument for ${$function.Type} of value ${$function.Value}`);
+    } else if ($function.Arguments[0].Type != TokenType.STRING) {
+        throw new Error(`Expected a language of type string, but got ${$function.Arguments[0].Type} of value ${$function.Arguments[0].Value}`);
+    }
+
+    return `:lang(${$function.Arguments[0].Value.trim()})`;
 }
 
 /**

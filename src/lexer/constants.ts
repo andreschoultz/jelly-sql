@@ -76,6 +76,8 @@ const functions: { [key: string]: TokenType } = {
     [FunctionType.TAG]: TokenType.FUNCTION,
     [FunctionType.CHILD]: TokenType.FUNCTION,
     [FunctionType.TYPEOF]: TokenType.FUNCTION,
+    [FunctionType.LANGUAGE]: TokenType.FUNCTION,
+    [FunctionType.LANG]: TokenType.FUNCTION,
 };
 
 const standaloneFunctions: { [key: string]: TokenType } = {

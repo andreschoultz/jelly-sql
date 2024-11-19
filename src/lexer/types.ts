@@ -85,6 +85,8 @@ enum FunctionType {
     TAG = 'TAG',
     CHILD = 'CHILD',
     TYPEOF = 'TYPEOF', // Equal representation for the `of-type` in structural pseudo selectors
+    LANGUAGE = 'LANGUAGE', // LANGUAGE == LANG
+    LANG = 'LANG', // LANG == LANGUAGE
 }
 
 enum CompoundType {
