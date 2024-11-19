@@ -40,9 +40,10 @@ Please see [Local Development](#Local-Development) for working with the source.
 - ~~Implement combinators, ex. ` `, `>`, `+`, `~`~~
 - Add support for nested groupings of `(...)`
 - ~~Implement pseudo selectors~~
-- (***Next***) Improve type checking & syntax errors
+- (***Active***) Improve type checking & syntax errors
 - ~~Unit testing~~
-- (***Active***) Comments with `--`
+- ~~Comments with `--`~~
+- Documentation
 - Support escaping characters?
 
 ## Local Development

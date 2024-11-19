@@ -51,6 +51,10 @@ function lexer(input: string): Token[] {
             continue;
         }
 
+        if (consumeRegexToken(rawToken.match(Regex.comment))) {
+            continue;
+        }
+
         if (pushRegexToken(rawToken.match(Regex.comment), TokenType.COMMENT)) {
             continue;
         }
