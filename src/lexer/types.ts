@@ -36,6 +36,7 @@ enum KeywordType {
     EVEN = 'EVEN',
     ONLY = 'ONLY',
     EMPTY = 'EMPTY',
+    ROOT = 'ROOT',
 
     /* Pseudo Selectors - Link */
     LINK = 'LINK',

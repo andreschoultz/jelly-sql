@@ -23,6 +23,7 @@ const keywords: { [key: string]: TokenType } = {
     [KeywordType.EVEN]: TokenType.KEYWORD,
     [KeywordType.ONLY]: TokenType.KEYWORD,
     [KeywordType.EMPTY]: TokenType.KEYWORD,
+    [KeywordType.ROOT]: TokenType.KEYWORD,
 
     /* Pseudo Selectors - Link */
     [KeywordType.LINK]: TokenType.KEYWORD,

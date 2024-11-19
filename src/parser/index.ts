@@ -347,6 +347,8 @@ function getStructuralPseudoSelector($function: Token, operationFunction: Token 
             selector = `only-${pseudoSelectorFunction}`;
         } else if (argument_1.Value === KeywordType.EMPTY) {
             selector = 'empty';
+        } else if (argument_1.Value === KeywordType.ROOT) {
+            selector = 'root';
         }
     } else if (argument_1?.Type === TokenType.EXPRESSION || argument_1?.Type === TokenType.NUMERIC) {
         nthExpression = argument_1.Value;
