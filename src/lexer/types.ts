@@ -19,6 +19,7 @@ enum KeywordType {
     SELECT = 'SELECT',
     FROM = 'FROM',
     WHERE = 'WHERE',
+    AS = 'AS',
 
     TAG = 'TAG', // TAG == ELEMENT
     ELEMENT = 'ELEMENT', // ELEMENT == TAG

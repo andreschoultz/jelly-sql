@@ -6,6 +6,7 @@ const keywords: { [key: string]: TokenType } = {
     [KeywordType.SELECT]: TokenType.KEYWORD,
     [KeywordType.FROM]: TokenType.KEYWORD,
     [KeywordType.WHERE]: TokenType.KEYWORD,
+    [KeywordType.AS]: TokenType.KEYWORD,
 
     [KeywordType.TAG]: TokenType.KEYWORD,
     [KeywordType.ELEMENT]: TokenType.KEYWORD,
@@ -55,6 +56,10 @@ const functions: { [key: string]: TokenType } = {
     [FunctionType.CHILD]: TokenType.FUNCTION,
 };
 
+const standaloneFunctions: { [key: string]: TokenType } = {
+    [FunctionType.TYPEOF]: TokenType.FUNCTION,
+};
+
 const tokenSequenceReplaceables: { [key: string]: OperatorType[] } = {
     [OperatorType.CHILD_OF]: [OperatorType.CHILD, OperatorType.OF],
     [OperatorType.NEXT_TO]: [OperatorType.NEXT, OperatorType.TO],
@@ -76,4 +81,4 @@ const Regex = {
     expression: /^[+-]?\s*\d*\s*N\s*(?:[+-]\s*\d+)?$|^[+-]?\s*\d+$|^\s*n\s*/,
 };
 
-export { Regex, keywords, operators, functions, tokenSequenceReplaceables, orOperatorSubstitutes };
+export { Regex, keywords, operators, functions, standaloneFunctions, tokenSequenceReplaceables, orOperatorSubstitutes };

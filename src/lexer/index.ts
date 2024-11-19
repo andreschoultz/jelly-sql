@@ -1,4 +1,4 @@
-import { functions, keywords, operators, Regex, tokenSequenceReplaceables } from './constants';
+import { functions, keywords, operators, Regex, standaloneFunctions, tokenSequenceReplaceables } from './constants';
 import { SymbolType, Token, TokenType } from './types';
 
 function cleanToken(value: string): string {
@@ -124,6 +124,8 @@ function lexer(input: string): Token[] {
 
             if (keywords[matchValue] == TokenType.KEYWORD) {
                 tokenType = TokenType.KEYWORD;
+            } else if (standaloneFunctions[matchValue]) {
+                tokenType = TokenType.FUNCTION;
             }
 
             tokens.push({ Type: tokenType, Value: matchValue.trim() });

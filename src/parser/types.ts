@@ -19,6 +19,7 @@ enum OperationType {
 class Expression {
     Tokens: Token[];
     JoiningOperator: JoiningOperatorType;
+    #previousToken: Token | undefined;
 
     constructor(tokens: Token[], joiningOperator: JoiningOperatorType) {
         this.Tokens = tokens;
@@ -38,11 +39,22 @@ class Expression {
             }
         }
 
+        this.#previousToken = token;
+
         return token;
     }
 
     nextToken(): Token | null {
         return this.Tokens.length > 0 ? this.Tokens[0] : null;
+    }
+
+    revertToken(): Token | null {
+        if (!this.#previousToken) return null;
+
+        this.Tokens.unshift(this.#previousToken);
+        this.#previousToken = undefined;
+
+        return this.Tokens[0];
     }
 }
 

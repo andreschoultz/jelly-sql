@@ -1,4 +1,4 @@
-import { OperatorType, Token } from '@/lexer/types';
+import { FunctionType, OperatorType, Token, TokenType } from '@/lexer/types';
 
 function hasSecondaryOperator(operator: Token, nextToken: Token | null): boolean {
     if (nextToken == null) return false;
@@ -17,4 +17,12 @@ function hasSecondaryOperator(operator: Token, nextToken: Token | null): boolean
     return false;
 }
 
-export { hasSecondaryOperator };
+function isPseudoSelector(token: Token): boolean {
+    if (token.Value === FunctionType.CHILD && token.Type === TokenType.FUNCTION) {
+        return true;
+    }
+
+    return false;
+}
+
+export { hasSecondaryOperator, isPseudoSelector };

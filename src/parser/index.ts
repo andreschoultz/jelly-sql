@@ -4,7 +4,7 @@ import { keywordPriority } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
 import { getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator, isValueToken } from './utilities';
-import { hasSecondaryOperator } from './validators';
+import { hasSecondaryOperator, isPseudoSelector } from './validators';
 
 /**
  * Processes a single QueryToken to create selector groups.
@@ -126,8 +126,8 @@ function createSelector(expression: Expression): Selector {
     let simpleComparatorType = OperationType.EQUALS;
     let secondaryOperator: Token | undefined;
 
-    // Don't parse for comparator-less expressions. Ex. `...WHERE TAG('a')`
-    if (isValueToken(expression.nextToken()) == false && expression.nextToken()) {
+    // Don't parse for comparator-less expressions. Ex. `...WHERE TAG('a')` or pseudo selectors.
+    if (isValueToken(expression.nextToken()) == false && expression.nextToken() && !isPseudoSelector(keyword)) {
         comparator = expression.consumeToken(TokenType.OPERATOR, [TokenType.IDENTIFIER, TokenType.SYMBOL]);
 
         if (expression.nextToken() && hasSecondaryOperator(comparator, expression.nextToken())) {
@@ -163,7 +163,14 @@ function createSelector(expression: Expression): Selector {
 
         basicSelector = getAttributeSelector(keyword, simpleComparatorType, valueToken);
     } else if (keyword.Value === FunctionType.CHILD && keyword.Type === TokenType.FUNCTION) {
-        basicSelector = getStructuralPseudoSelector(keyword);
+        let operationFunction: Token | undefined; // TYPEOF
+
+        if (expression.nextToken()?.Type === TokenType.KEYWORD && expression.nextToken()?.Value === KeywordType.AS) {
+            expression.consumeToken(TokenType.KEYWORD); // Alias keyword (not used)
+            operationFunction = expression.consumeToken(TokenType.FUNCTION);
+        }
+
+        basicSelector = getStructuralPseudoSelector(keyword, operationFunction);
     } else {
         throw new Error(`Unable to handle foreign selector of type ${keyword.Value}.`);
     }
@@ -301,42 +308,46 @@ function getClassSelector(keyword: Token, simpleComparatorType: OperationType, v
  *
  * @param keyword - The token representing the structural pseudo-class, which includes
  *                  arguments defining its behavior.
+ * @param operationFunction - The token representing the operation function (e.g., `of-type`).
  * @returns A string representing the structural pseudo-class selector in CSS format.
  *
  * @throws An error if:
- * - The token has no arguments or invalid arguments.
+ * - The operation function is not of type `of-type`.
  * - Unexpected argument types or values are provided.
  * - Arguments fail to correspond to known pseudo-classes or valid nth-child expressions.
  */
-function getStructuralPseudoSelector(keyword: Token): string {
+function getStructuralPseudoSelector(keyword: Token, operationFunction: Token | undefined): string {
     let selector: string | undefined;
 
-    if (!keyword.Arguments || keyword.Arguments.length == 0) {
-        throw new Error(`Expected at least 1 argument for ${keyword.Type} of value ${keyword.Value}`);
+    if (operationFunction && operationFunction.Value != FunctionType.TYPEOF) {
+        throw new Error(`Expected ${TokenType.FUNCTION} of type ${FunctionType.TYPEOF}, but got ${operationFunction.Type} of value ${operationFunction.Value}`);
     }
 
     let locationKeyword: KeywordType = KeywordType.FIRST;
     let nthExpression: string | undefined;
-    const argument_1: Token = keyword.Arguments[0];
-    const argument_2: Token | undefined = keyword.Arguments.length > 1 ? keyword.Arguments[1] : undefined;
+    const argument_1: Token | undefined = keyword.Arguments && keyword.Arguments.length > 0 ? keyword.Arguments[0] : undefined;
+    const argument_2: Token | undefined = keyword.Arguments && keyword.Arguments?.length > 1 ? keyword.Arguments[1] : undefined;
+    const pseudoSelectorFunction = operationFunction ? 'of-type' : 'child';
+
+    const getWrongArgumentErrorMsg = (argument: Token) =>
+        `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${keyword.Type} ${keyword.Value}, but got ${argument.Type} of value ${argument.Value}.`;
 
     /* ------ 1st Argument */
-    if (argument_1.Type === TokenType.KEYWORD) {
+
+    if (argument_1?.Type === TokenType.KEYWORD) {
         if (argument_1.Value === KeywordType.FIRST || argument_1.Value === KeywordType.LAST) {
             locationKeyword = KeywordType[argument_1.Value];
         } else if (argument_1.Value === KeywordType.ODD || argument_1.Value === KeywordType.EVEN) {
             nthExpression = argument_1.Value;
         } else if (argument_1.Value === KeywordType.ONLY) {
-            selector = 'only-child';
+            selector = `only-${pseudoSelectorFunction}`;
         } else if (argument_1.Value === KeywordType.EMPTY) {
             selector = 'empty';
         }
-    } else if (argument_1.Type === TokenType.EXPRESSION || argument_1.Type === TokenType.NUMERIC) {
+    } else if (argument_1?.Type === TokenType.EXPRESSION || argument_1?.Type === TokenType.NUMERIC) {
         nthExpression = argument_1.Value;
     } else if (argument_1) {
-        throw new Error(
-            `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${keyword.Type} ${keyword.Value}, but got ${argument_1.Type} of value ${argument_1.Value}.`
-        );
+        throw new Error(getWrongArgumentErrorMsg(argument_1));
     }
 
     /* ------ 2nd Argument ------ */
@@ -349,9 +360,7 @@ function getStructuralPseudoSelector(keyword: Token): string {
     } else if (argument_2?.Type === TokenType.EXPRESSION || argument_2?.Type === TokenType.NUMERIC) {
         nthExpression = argument_2.Value;
     } else if (argument_2) {
-        throw new Error(
-            `Expected ${TokenType.KEYWORD}, ${TokenType.EXPRESSION} or ${TokenType.NUMERIC} for ${keyword.Type} ${keyword.Value}, but got ${argument_2.Type} of value ${argument_2.Value}.`
-        );
+        throw new Error(getWrongArgumentErrorMsg(argument_2));
     }
 
     if (selector) {
@@ -361,9 +370,9 @@ function getStructuralPseudoSelector(keyword: Token): string {
     /* ------ Final assembly ------ */
     if (nthExpression) {
         nthExpression = nthExpression.replaceAll(' ', '');
-        selector = `nth` + (locationKeyword === KeywordType.FIRST ? '' : `-${KeywordType.LAST.toLowerCase()}`) + `-child(${nthExpression})`;
+        selector = `nth` + (locationKeyword === KeywordType.FIRST ? '' : `-${KeywordType.LAST.toLowerCase()}`) + `-${pseudoSelectorFunction}(${nthExpression})`;
     } else {
-        selector = `${locationKeyword.toLowerCase()}-child`;
+        selector = `${locationKeyword.toLowerCase()}-${pseudoSelectorFunction}`;
     }
 
     return `:${selector}`;
