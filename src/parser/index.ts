@@ -1,9 +1,14 @@
-import { FunctionType, KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
+import {
+    FunctionType, KeywordType, OperatorType, SymbolType, Token, TokenType
+} from '@/lexer/types';
 
 import { keywordPriority, pseudoKeywordSelector } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
-import { getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator, isValueToken } from './utilities';
+import {
+    getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator,
+    isValueToken
+} from './utilities';
 import { hasSecondaryOperator, isPseudoSelector } from './validators';
 
 /**
@@ -229,9 +234,9 @@ function getAttributeSelector(keyword: Token, simpleComparatorType: OperationTyp
             const hasEnd = valueToken.Value.endsWith(SymbolType.PERCENT);
 
             if (hasStart && !hasEnd) {
-                selector = '^=';
-            } else if (!hasStart && hasEnd) {
                 selector = '$=';
+            } else if (!hasStart && hasEnd) {
+                selector = '^=';
             } else {
                 selector = '*=';
             }
