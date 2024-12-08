@@ -2,9 +2,9 @@
 sidebar_position: 1
 ---
 
-# Selector Quick Reference
+# Cheat Sheet
 
-A quick reference table for comparing W3C Selectors with the SQL-like syntax used in Jelly SQL.
+A quick reference table for comparing [W3C Selectors](https://www.w3.org/TR/selectors-3/#selectors) with the SQL-like syntax used in Jelly SQL.
 
 
 | SQL                            | CSS                    | Description                                                                                                             | W3C Specification                                                                                | Variants                                                        |

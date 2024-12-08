@@ -37,7 +37,7 @@ Arguments are values that are passed to a function. The number of arguments that
 Arguments can be of any common type parsed by the tokenizer, but common ones include:
 
 - Keywords
-- Expressions
+- Expressions (Math)
 - Strings
 - Numbers
 

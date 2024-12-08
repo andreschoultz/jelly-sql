@@ -1,3 +1,5 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import TOCInline from '@theme/TOCInline';
 
 # Keywords
@@ -7,6 +9,49 @@ Keywords are reserved words in the syntax that have special meaning. Keywords ar
 Keywords may be used in string literals, but they are not treated as keywords in that context. For example, `LINK` is a keyword, but `'LINK'` is a string literal that may be used in attribute selectors.
 
 <TOCInline toc={toc} />
+
+## Priority
+
+CSS Selectors are written in a specific order. For example, element selectors are written before attribute or pseudo selectors. Aside from combinators, you don't have to worry about maintaining this order in your Jelly SQL. The parser will automatically sort the selectors in the correct order.
+
+#### Parser Order (Highest to Lowest) 
+
+1. `TAG` || `ELEMENT`
+2. `ID`
+3. `CLASS`
+4. `ATTRIBUTE` || `ATTR`
+
+:::note
+
+Any not mentioned, will be sorted based on the defined order in your Jelly SQL query.
+
+:::
+
+### Combinators
+
+CSS combinator selectors are evaluated from right to left. In Jelly SQL, the order is defined by the language itself.
+
+Here's an example of a combinator in CSS:
+
+<Tabs groupId="sql-css">
+<TabItem value="sql" label="SQL">
+
+```sql
+SELECT * FROM DOM WHERE
+TAG('p') CHILD OF TAG('div')
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+div > p {
+  /* Styles */
+}
+```
+
+</TabItem>
+</Tabs>
 
 ## Statement Keywords
 

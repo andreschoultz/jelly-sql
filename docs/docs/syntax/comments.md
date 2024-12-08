@@ -1,6 +1,6 @@
 # Comments
 
-Comments are used to document your code. They are ignored by the parser and are not executed. Comments can be used to explain what the code does, why it does it, or how it works. Comments can also be used to temporarily disable SQL.
+Comments are used to document your code. They are ignored by the parser and are not executed. Comments can be used to explain what the code does, why it does it, or how it works. They are also useful to temporarily disable SQL.
 
 Jelly SQL follows the typical SQL comment syntax. There are two types of comments:
 
@@ -11,7 +11,7 @@ Jelly SQL follows the typical SQL comment syntax. There are two types of comment
 
 Single-line comments start with `--` and continue until the end of the line. They are used to add comments to a single line of code.
 
-Here's an example of a single-line comment:
+Here's an example of single-line comments:
 
 ```sql {2-3}
 -- This is a single-line comment
@@ -24,7 +24,7 @@ TAG = 'p' -- Filter by paragraph tags
 
 Multi-line comments start with `/*` and end with `*/`. They are used to add comments that span multiple lines of code.
 
-Here's an example of a multi-line comment:
+Here's an example of multi-line comments:
 
 ```sql {6-7,10}
 /*
