@@ -318,4 +318,4 @@ The reserved keywords for combinators are:
 - `OF`
 - `TO`
 
-We won't going into detail about these combinators here, but you can find more information in the [Combinators](./combinators.md) section.
+We won't going into detail about these combinators here, but you can find more information in the [Combinators](../selectors/combinators.md) section.
