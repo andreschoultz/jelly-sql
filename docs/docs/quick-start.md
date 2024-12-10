@@ -57,7 +57,6 @@ You can also use Jelly SQL in the browser by including the following script tag:
 
 This will expose the `jellySQL` object globally, which you can use to query the DOM. See the [API documentation](./api.md) for more information, and the [cheat sheet](./selectors/refernece-table.md) for a quick reference.
 
-```html
 
 ```javascript
 const selector = jellySQL.query(`SELECT * FROM DOM WHERE TAG = 'a'`);

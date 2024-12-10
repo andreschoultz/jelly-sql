@@ -5,46 +5,62 @@
 
 <br />
 
-<h1 align="center"> Jelly SQL - JavaScript DOM Query Selector </h1>
-<h2 align="center"> *** Work In Progress *** </h2>
+<h1 align="center"> Jelly SQL - CSS Query Selectors With SQL </h1>
 
 # 
 
 ## About
 
-Query the DOM in JavaScript with a familiar SQL syntax. Generates a CSS query selector that will in turn call the `document.querySelectorAll()`. Maybe a little magic sprinkle of dynamic functions to extend the capability of generic DOM query selectors.
+Query the DOM in JavaScript with a familiar SQL syntax. Generates a CSS query selector that will in turn call the `document.querySelectorAll()`.
 
-## Installation
+## Getting Started
 
-> TODO:
->  - CDN link
->  - Basic JS library usage example
+Jelly SQL requires no third-party dependencies. You can use it in the browser or in Node.js. TypeScript is also supported.
+
+Full documentation can be found at [docs.jellysql.com](https://docs.jellysql.com).
+
+### Using `npm` or `yarn`
+
+#### Install
 
 
-Please see [Local Development](#Local-Development) for working with the source.
+```shell
+npm install jelly-sql
+```
+OR
 
-## Documentation
+```shell
+yarn add jelly-sql
+```
 
-> TODO
+#### Import & Use
 
-## Features
+See the [API documentation](https://docs.jellysql.com/docs/api) for more information, and the [cheat sheet](https://docs.jellysql.com/docs/selectors/refernece-table) for a quick reference.
 
-> TODO
+```typescript
+import { query } from 'jelly-sql';
 
-### TODO
+const selector = query(`SELECT * FROM DOM WHERE TAG = 'a'`);
+console.log(selector); // Output: "a"
+```
 
-- ~~Extend attribute substring selectors~~
-- ~~Implement `:not()`~~
-- ~~Force tag selectors to front of query~~
-- ~~Resolve selectors duplicating with multiple un-grouped `OR` operators~~
-- ~~Implement combinators, ex. ` `, `>`, `+`, `~`~~
-- Add support for nested groupings of `(...)`
-- ~~Implement pseudo selectors~~
-- (***Active***) Improve type checking & syntax errors
-- ~~Unit testing~~
-- ~~Comments with `--`~~
-- Documentation
-- Support escaping characters?
+### Using a CDN (Browser)
+
+You can also use Jelly SQL in the browser by including the following script tag:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/jelly-sql@latest/build/dist/jelly-sql.min.js"></script>
+```
+
+#### Usage
+
+This will expose the `jellySQL` object globally, which you can use to query the DOM. See the [API documentation](https://docs.jellysql.com/docs/api) for more information, and the [cheat sheet](https://docs.jellysql.com/docs/selectors/refernece-table) for a quick reference.
+
+
+```javascript
+const selector = jellySQL.query(`SELECT * FROM DOM WHERE TAG = 'a'`);
+console.log(selector); // Output: "a"
+```
 
 ## Local Development
 
