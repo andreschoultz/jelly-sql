@@ -1,25 +1,36 @@
 {
   "name": "jelly-sql",
   "private": false,
-  "version": "0.9.1",
+  "version": "0.9.12",
   "description": "Jelly SQL is a JavaScript library for querying the DOM using SQL syntax.",
-  "main": "./dist/jelly-sql.min.js",
-  "module": "./dist/jelly-sql.js",
+  "main": "./build/dist/jelly-sql.min.js",
+  "module": "./build/dist/jelly-sql.js",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/jelly-sql.js",
-      "require": "./dist/jelly-sql.js"
-    },
-    "./dist/": {
-      "import": "./dist/"
+      "import": "./build/dist/jelly-sql.js",
+      "require": "./build/dist/jelly-sql.umd.js",
+      "types": "./build/dist/index.d.ts"
     }
   },
-  "types": "./dist/index.d.ts",
+  "types": "./build/dist/index.d.ts",
   "files": [
     "build/dist",
     "!build/dist/*.css"
   ],
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true,
+      "es2020": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "sourceType": "module"
+    }
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "rimraf --glob build/**/* && tsc && vite build && dts-bundle-generator --config ./dts-bundle-generator.config.ts && copyfiles ./package.json build",
@@ -30,9 +41,7 @@
     "lint:styles": "stylelint ./**/*.{css,scss}",
     "format:scripts": "prettier . --write",
     "format:styles": "stylelint ./**/*.{css,scss} --fix",
-    "format": "npm run format:scripts && npm run format:styles",
-    "prepare": "husky && echo 'npx lint-staged' > .husky/pre-commit && git add .husky/pre-commit",
-    "uninstall-husky": "npm uninstall husky --no-save && git config --unset core.hooksPath && npx rimraf .husky"
+    "format": "npm run format:scripts && npm run format:styles"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
@@ -45,7 +54,6 @@
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "husky": "^9.1.4",
     "lint-staged": "^15.2.7",
     "postcss": "^8.4.40",
     "postcss-scss": "^4.0.9",
@@ -66,7 +74,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/andreschoultz/jelly-sql.git"
+    "url": "https://github.com/andreschoultz/jelly-sql"
   },
   "bugs": {
     "url": "https://github.com/andreschoultz/jelly-sql/issues"
