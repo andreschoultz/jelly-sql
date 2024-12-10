@@ -16,7 +16,7 @@ Logical grouping is a way to group multiple conditions together to form a single
 
 Self grouping expressions is the process of automatically grouping expressions based on their logical operator, or keyword.
 
-The parser will always group `AND` expressions together. Thus `OR` operators will determine the split between groups. As described in the ##TODO: Combinators## section, the parser will also group and treat them as `AND` operators. Hence why the `AND` operator is not required when chaining combinators.
+The parser will always group `AND` expressions together. Thus `OR` operators will determine the split between groups. As described in the [combinators](../selectors/combinators.md#a-few-things-to-keep-in-mind) section, the parser will also group and treat them as `AND` operators. Hence why the `AND` operator is not required when chaining combinators.
 
 #### Here's an example to illustrate self grouping:
 

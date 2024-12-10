@@ -1,18 +1,25 @@
 {
   "name": "jelly-sql",
-  "private": true,
-  "version": "0.0.4",
+  "private": false,
+  "version": "0.9.1",
+  "description": "Jelly SQL is a JavaScript library for querying the DOM using SQL syntax.",
+  "main": "./dist/jelly-sql.min.js",
   "module": "./dist/jelly-sql.js",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/jelly-sql.js"
+      "import": "./dist/jelly-sql.js",
+      "require": "./dist/jelly-sql.js"
     },
     "./dist/": {
       "import": "./dist/"
     }
   },
   "types": "./dist/index.d.ts",
+  "files": [
+    "build/dist",
+    "!build/dist/*.css"
+  ],
   "scripts": {
     "dev": "vite --host",
     "build": "rimraf --glob build/**/* && tsc && vite build && dts-bundle-generator --config ./dts-bundle-generator.config.ts && copyfiles ./package.json build",
@@ -53,5 +60,16 @@
     "typescript": "^5.3.3",
     "vite": "^5.3.5",
     "vitest": "^2.0.4"
-  }
+  },
+  "keywords": ["javascript", "css", "html", "dom", "lexer", "queryselector", "query", "sql", "sql-syntax", "jelly", "jellySQL", "parser"],
+  "author": "Andre Schoultz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreschoultz/jelly-sql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andreschoultz/jelly-sql/issues"
+  },
+  "homepage": "https://jellysql.com"
 }
