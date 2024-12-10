@@ -1,7 +1,7 @@
 {
   "name": "jelly-sql",
   "private": false,
-  "version": "0.9.12",
+  "version": "0.9.13",
   "description": "Jelly SQL is a JavaScript library for querying the DOM using SQL syntax.",
   "main": "./build/dist/jelly-sql.min.js",
   "module": "./build/dist/jelly-sql.js",
