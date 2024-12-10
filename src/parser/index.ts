@@ -229,9 +229,9 @@ function getAttributeSelector(keyword: Token, simpleComparatorType: OperationTyp
             const hasEnd = valueToken.Value.endsWith(SymbolType.PERCENT);
 
             if (hasStart && !hasEnd) {
-                selector = '^=';
-            } else if (!hasStart && hasEnd) {
                 selector = '$=';
+            } else if (!hasStart && hasEnd) {
+                selector = '^=';
             } else {
                 selector = '*=';
             }

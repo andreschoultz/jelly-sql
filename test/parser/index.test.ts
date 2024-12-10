@@ -197,13 +197,13 @@ describe('QuerySelector Generator', () => {
                     { input: `'%alert-modal%'`, expected: '[id*="alert-modal"]' },
                     { input: `'%user_form%'`, expected: '[id*="user_form"]' },
 
-                    { input: `'%confirmation'`, expected: '[id^="confirmation"]' },
-                    { input: `'%alert-modal'`, expected: '[id^="alert-modal"]' },
-                    { input: `'%user_form'`, expected: '[id^="user_form"]' },
+                    { input: `'%confirmation'`, expected: '[id$="confirmation"]' },
+                    { input: `'%alert-modal'`, expected: '[id$="alert-modal"]' },
+                    { input: `'%user_form'`, expected: '[id$="user_form"]' },
 
-                    { input: `'confirmation%'`, expected: '[id$="confirmation"]' },
-                    { input: `'alert-modal%'`, expected: '[id$="alert-modal"]' },
-                    { input: `'user_form%'`, expected: '[id$="user_form"]' },
+                    { input: `'confirmation%'`, expected: '[id^="confirmation"]' },
+                    { input: `'alert-modal%'`, expected: '[id^="alert-modal"]' },
+                    { input: `'user_form%'`, expected: '[id^="user_form"]' },
                 ];
 
                 for (const keyword of validKeywords) {
@@ -318,13 +318,13 @@ describe('QuerySelector Generator', () => {
                     { input: `'%btn-large%'`, expected: '[class*="btn-large"]' },
                     { input: `'%modal_header%'`, expected: '[class*="modal_header"]' },
 
-                    { input: `'%success'`, expected: '[class^="success"]' },
-                    { input: `'%btn-large'`, expected: '[class^="btn-large"]' },
-                    { input: `'%modal_header'`, expected: '[class^="modal_header"]' },
+                    { input: `'%success'`, expected: '[class$="success"]' },
+                    { input: `'%btn-large'`, expected: '[class$="btn-large"]' },
+                    { input: `'%modal_header'`, expected: '[class$="modal_header"]' },
 
-                    { input: `'success%'`, expected: '[class$="success"]' },
-                    { input: `'btn-large%'`, expected: '[class$="btn-large"]' },
-                    { input: `'modal_header%'`, expected: '[class$="modal_header"]' },
+                    { input: `'success%'`, expected: '[class^="success"]' },
+                    { input: `'btn-large%'`, expected: '[class^="btn-large"]' },
+                    { input: `'modal_header%'`, expected: '[class^="modal_header"]' },
                 ];
 
                 for (const keyword of validKeywords) {
@@ -487,13 +487,13 @@ describe('QuerySelector Generator', () => {
                     testCases.push({
                         attributeName,
                         input: formatInputForLikeComparison(unquotedInput, 'start'),
-                        expected: `[${attributeName}^="${unquotedInput.replace('[%]', '%')}"]`,
+                        expected: `[${attributeName}$="${unquotedInput.replace('[%]', '%')}"]`,
                     });
 
                     testCases.push({
                         attributeName,
                         input: formatInputForLikeComparison(unquotedInput, 'end'),
-                        expected: `[${attributeName}$="${unquotedInput.replace('[%]', '%')}"]`,
+                        expected: `[${attributeName}^="${unquotedInput.replace('[%]', '%')}"]`,
                     });
                 }
 
@@ -628,12 +628,12 @@ describe('QuerySelector Generator', () => {
 
                     testCases.push({
                         input: formatInputForLikeComparison(unquotedInput, 'start'),
-                        expected: `[style^="${unquotedInput.replace('[%]', '%')}"]`,
+                        expected: `[style$="${unquotedInput.replace('[%]', '%')}"]`,
                     });
 
                     testCases.push({
                         input: formatInputForLikeComparison(unquotedInput, 'end'),
-                        expected: `[style$="${unquotedInput.replace('[%]', '%')}"]`,
+                        expected: `[style^="${unquotedInput.replace('[%]', '%')}"]`,
                     });
                 }
 
