@@ -2,46 +2,64 @@
 sidebar_position: 1
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Quick Start
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Jelly SQL is a SQL-like language for querying the DOM. It allows you to generate CSS selectors using SQL syntax. See the [quick start example](./api.md#example) for more information.
 
 ## Getting Started
 
-Get started by **creating a new site**.
+Jelly SQL requires no third-party dependencies. You can use it in the browser or in Node.js. TypeScript is also supported.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+### Using `npm` or `yarn`
 
-### What you'll need
+#### Install
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+<Tabs groupId="npm-yarn">
+<TabItem value="npm" label="NPM">
 
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
+```shell
+npm install jelly-sql
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+</TabItem>
+<TabItem value="yarn" label="Yarn">
 
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
+```shell
+yarn add jelly-sql
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+</TabItem>
+</Tabs>
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+#### Import & Use
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+See the [API documentation](./api.md) for more information, and the [cheat sheet](./selectors/refernece-table.md) for a quick reference.
+
+```typescript
+import { query } from 'jelly-sql';
+
+const selector = query(`SELECT * FROM DOM WHERE TAG = 'a'`);
+console.log(selector); // Output: "a"
+```
+
+### Using a CDN (Browser)
+
+You can also use Jelly SQL in the browser by including the following script tag:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/jelly-sql@latest/build/dist/jelly-sql.min.js"></script>
+```
+
+#### Usage
+
+This will expose the `jellySQL` object globally, which you can use to query the DOM. See the [API documentation](./api.md) for more information, and the [cheat sheet](./selectors/refernece-table.md) for a quick reference.
+
+```html
+
+```javascript
+const selector = jellySQL.query(`SELECT * FROM DOM WHERE TAG = 'a'`);
+console.log(selector); // Output: "a"
+```

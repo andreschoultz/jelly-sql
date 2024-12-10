@@ -31,7 +31,29 @@ const config: Config = {
         defaultLocale: 'en',
         locales: ['en'],
     },
-
+    headTags: [
+        {
+            tagName: 'meta',
+            attributes: {
+                name: 'description',
+                content: 'Jelly SQL is a powerful JavaScript library designed to query the DOM using SQL syntax',
+            }
+        },
+        {
+            tagName: 'meta',
+            attributes: {
+                name: 'keywords',
+                content: 'Jelly SQL, JavaScript SQL, DOM querying, SQL parser, JavaScript library, documentation',
+            }
+        },
+        {
+            tagName: 'meta',
+            attributes: {
+                name: 'robots',
+                content: 'index, follow',
+            }
+        }
+    ],
     presets: [
         [
             'classic',
@@ -69,7 +91,7 @@ const config: Config = {
         navbar: {
             title: 'Jelly SQL',
             logo: {
-                alt: 'My Site Logo',
+                alt: 'Jelly SQL Site Logo',
                 src: 'img/logo.svg',
             },
             items: [
@@ -99,8 +121,24 @@ const config: Config = {
                     title: 'Docs',
                     items: [
                         {
-                            label: 'Tutorial',
-                            to: '/docs/intro',
+                            label: 'Quick Start',
+                            to: '/docs/quick-start',
+                        },
+                        {
+                            label: 'API',
+                            to: '/docs/api',
+                        },
+                        {
+                            label: 'CSS Selectors',
+                            to: '/docs/category/css-selectors',
+                        },
+                        {
+                            label: 'Language & Syntax',
+                            to: '/docs/category/language--syntax-structure',
+                        },
+                        {
+                            label: 'Limitations',
+                            to: '/docs/limitations',
                         },
                     ],
                 },
@@ -120,10 +158,14 @@ const config: Config = {
                             label: 'GitHub',
                             href: 'https://github.com/andreschoultz/jelly-sql',
                         },
+                        {
+                            label: 'NPM',
+                            href: 'https://www.npmjs.com/package/jelly-sql',
+                        },
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} Andre Schoultz. Built with Docusaurus.`,
+            copyright: `Copyright © ${new Date().getFullYear()} Andre Schoultz`,
         },
         prism: {
             theme: prismThemes.github,
