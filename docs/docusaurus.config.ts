@@ -9,24 +9,12 @@ const config: Config = {
     title: 'Jelly SQL',
     tagline: 'The jelly goes jiggle-jiggle',
     favicon: 'img/favicon.svg',
-
-    // Set the production url of your site here
-    url: 'https://jellysql.com/',
-    // Set the /<baseUrl>/ pathname under which your site is served
-    // For GitHub pages deployment, it is often '/<projectName>/'
+    url: 'https://docs.jellysql.com/',
     baseUrl: '/',
-
-    // GitHub pages deployment config.
-    // If you aren't using GitHub pages, you don't need these.
-    organizationName: 'andreschoultz', // Usually your GitHub org/user name.
-    projectName: 'jelly-sql', // Usually your repo name.
-
+    organizationName: 'andreschoultz',
+    projectName: 'jelly-sql',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
-
-    // Even if you don't use internationalization, you can use this field to set
-    // useful metadata like html lang. For example, if your site is Chinese, you
-    // may want to replace "en" with "zh-Hans".
     i18n: {
         defaultLocale: 'en',
         locales: ['en'],
@@ -37,22 +25,22 @@ const config: Config = {
             attributes: {
                 name: 'description',
                 content: 'Jelly SQL is a powerful JavaScript library designed to query the DOM using SQL syntax',
-            }
+            },
         },
         {
             tagName: 'meta',
             attributes: {
                 name: 'keywords',
                 content: 'Jelly SQL, JavaScript SQL, DOM querying, SQL parser, JavaScript library, documentation',
-            }
+            },
         },
         {
             tagName: 'meta',
             attributes: {
                 name: 'robots',
                 content: 'index, follow',
-            }
-        }
+            },
+        },
     ],
     presets: [
         [
@@ -60,8 +48,6 @@ const config: Config = {
             {
                 docs: {
                     sidebarPath: './sidebars.ts',
-                    // Please change this to your repo.
-                    // Remove this to remove the "edit this page" links.
                     editUrl: 'https://github.com/andreschoultz/jelly-sql',
                 },
                 blog: {
@@ -70,10 +56,7 @@ const config: Config = {
                         type: ['rss', 'atom'],
                         xslt: true,
                     },
-                    // Please change this to your repo.
-                    // Remove this to remove the "edit this page" links.
                     editUrl: 'https://github.com/andreschoultz/jelly-sql',
-                    // Useful options to enforce blogging best practices
                     onInlineTags: 'warn',
                     onInlineAuthors: 'warn',
                     onUntruncatedBlogPosts: 'warn',
@@ -86,8 +69,7 @@ const config: Config = {
     ],
 
     themeConfig: {
-        // Replace with your project's social card
-        image: 'img/docusaurus-social-card.jpg',
+        image: 'img/logo.svg',
         navbar: {
             title: 'Jelly SQL',
             logo: {
@@ -182,6 +164,16 @@ const config: Config = {
                     block: { start: 'highlight-start-error', end: 'highlight-end-error' },
                 },
             ],
+        },
+        algolia: {
+            appId: '9UKK91VTS8',
+            apiKey: '343c61b3d2e4e5d6c068bfacbd07ea05',
+            indexName: 'jellysql',
+            contextualSearch: true,
+            externalUrlRegex: 'external\\.com|domain\\.com',
+            searchParameters: {},
+            searchPagePath: 'search',
+            insights: false,
         },
     } satisfies Preset.ThemeConfig,
 };
