@@ -154,11 +154,13 @@ import { parser } from './parser';
     AND Attribute('data-color') = 'red'
  */
 
-const sqlDomQuery = `SELECT * FROM DOM WHERE ATTR('value') CONTAINS 'ready' AND CLASS = 'btn-blue' AND ID = 'confirm-link' -- A single line comment
-/* Making
-* a
-multi-line
-* comment */ AND TAG = 'a' AND CHILD(FIRST, 2N+1) AS TYPEOF AND TYPEOF(FIRSTLETTER) WITHIN LANGUAGE('fr')`;
+//  div > span > p[data-color="orange"], div [data-color], div > div p + span.text-blue, div ~ p
+
+const sqlDomQuery = `SELECT * FROM DOM WHERE
+(TAG = 'p' AND ATTR('data-color') = 'orange' CHILD OF TAG = 'span' CHILD OF TAG = 'div')
+OR (ATTR('data-color') WITHIN TAG = 'div')
+OR (TAG = 'span' AND CLASS = 'text-blue' NEXT TO TAG = 'p' WITHIN TAG = 'div' CHILD OF TAG = 'div')
+OR (TAG = 'p' SIBLING OF TAG = 'div')`;
 
 const lexerTokens = lexer(sqlDomQuery);
 console.log('Lexer Tokens: ', lexerTokens);

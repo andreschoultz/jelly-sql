@@ -32,7 +32,7 @@ export default defineConfig({
             entry: path.resolve(__dirname, 'src/index.ts'),
             name: getPackageNameCamelCase(),
             formats,
-            fileName: format => fileName[format],
+            fileName: format => (fileName as Record<string, string>)[format],
         },
         minify: true,
     },

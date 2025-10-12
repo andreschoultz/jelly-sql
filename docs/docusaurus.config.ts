@@ -90,6 +90,11 @@ const config: Config = {
                     label: 'Quick Start',
                 },
                 {
+                    to: '/playground',
+                    label: 'Playground',
+                    position: 'left',
+                },
+                {
                     href: 'https://github.com/andreschoultz/jelly-sql',
                     label: 'GitHub',
                     position: 'right',

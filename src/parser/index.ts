@@ -1,9 +1,14 @@
-import { FunctionType, KeywordType, OperatorType, SymbolType, Token, TokenType } from '@/lexer/types';
+import {
+    FunctionType, KeywordType, OperatorType, SymbolType, Token, TokenType
+} from '@/lexer/types';
 
 import { keywordPriority, pseudoKeywordSelector } from './constants';
 import { buildExpressions } from './expressionBuilder';
 import { Expression, OperationType, QueryToken, Selector, SelectorGroup } from './types';
-import { getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator, isValueToken } from './utilities';
+import {
+    getAttributeName, getCombinatorSeparator, getSimpleOperationType, isCombinatorOperator,
+    isValueToken
+} from './utilities';
 import { hasSecondaryOperator, isPseudoSelector } from './validators';
 
 /**
@@ -376,7 +381,7 @@ function getStructuralPseudoSelector($function: Token, operationFunction: Token 
     /* ------ Final assembly ------ */
     if (nthExpression) {
         nthExpression = nthExpression.replaceAll(' ', '');
-        selector = `nth` + (locationKeyword === KeywordType.FIRST ? '' : `-${KeywordType.LAST.toLowerCase()}`) + `-${pseudoSelectorFunction}(${nthExpression})`;
+        selector = `nth` + (locationKeyword === KeywordType.FIRST ? '' : `-${KeywordType.LAST.toLowerCase()}`) + `-${pseudoSelectorFunction}(${nthExpression.toLowerCase()})`;
     } else {
         selector = `${locationKeyword.toLowerCase()}-${pseudoSelectorFunction}`;
     }
