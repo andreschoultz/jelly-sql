@@ -1,17 +1,40 @@
 
 <p align="center">
-  <img width="460" height="300" src="./favicon.svg">
+  <img width="460" height="300" src="https://raw.githubusercontent.com/andreschoultz/jelly-sql/main/favicon.svg">
 </p>
 
 <br />
 
 <h1 align="center"> Jelly SQL - CSS Query Selectors With SQL </h1>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/jelly-sql">
+    <img src="https://img.shields.io/npm/v/jelly-sql.svg" alt="npm version">
+  </a>
+  <a href="https://www.npmjs.com/package/jelly-sql">
+    <img src="https://img.shields.io/npm/dm/jelly-sql.svg" alt="npm downloads">
+  </a>
+  <a href="https://bundlephobia.com/package/jelly-sql">
+    <img src="https://img.shields.io/bundlephobia/minzip/jelly-sql" alt="bundle size">
+  </a>
+  <a href="https://github.com/andreschoultz/jelly-sql/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/andreschoultz/jelly-sql/pr-push-test-build.yml" alt="build status">
+  </a>
+  <a href="https://github.com/andreschoultz/jelly-sql/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/andreschoultz/jelly-sql" alt="license">
+  </a>
+  <img src="https://img.shields.io/badge/TypeScript-Ready-blue" alt="TypeScript">
+</p>
+
 # 
 
 ## About
 
 Query the DOM in JavaScript with a familiar SQL syntax. Generates a CSS query selector that will in turn call the `document.querySelectorAll()`.
+
+## Playground ✨
+
+A live [playground](https://jellysql.com/playground) is available to test out queries and see the generated CSS selectors.
 
 ## Getting Started
 

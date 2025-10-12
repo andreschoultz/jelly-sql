@@ -242,13 +242,85 @@ TAG = 'a' AND (CLASS = 'active' OR CLASS = 'link') -- Cross-apply selector is pl
 
 :::
 
-## Limitations
+## Enhanced Nested Grouping
 
-The parser currently only supports shallow grouping. Meaning, you can not nest multiple groups within each other.
+As of the latest version, the parser now supports **nested grouping** with parentheses, allowing for more complex logical expressions.
 
-For example, the following query is invalid and will likely throw a parsing error, or generate invalid CSS selectors:
+### Double Nested Expressions
+
+You can now use nested parentheses for complex conditions:
+
+<Tabs groupId="sql-css">
+<TabItem value="sql" label="SQL">
 
 ```sql
 SELECT * FROM DOM WHERE
 TAG = 'a' AND (CLASS = 'active' OR (CLASS = 'link' AND ID = 'new-link'))
 ```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+a.active, a#new-link.link {
+  /* Styles */
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Triple Nested Expressions
+
+Even deeper nesting is now supported:
+
+<Tabs groupId="sql-css">
+<TabItem value="sql" label="SQL">
+
+```sql
+SELECT * FROM DOM WHERE
+TAG = 'div' AND (CLASS = 'container' OR (CLASS = 'wrapper' AND (ID = 'main' OR ID = 'sidebar')))
+```
+
+</TabItem>
+<TabItem value="css" label="CSS">
+
+```css
+div.container, div#main.wrapper, div#sidebar.wrapper {
+  /* Styles */
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Real-world Examples
+
+**Navigation Menu Selectors:**
+```sql
+SELECT * FROM DOM WHERE
+TAG = 'nav' AND (CLASS = 'main-menu' OR (CLASS = 'mobile-menu' AND ATTR('data-mobile') = 'true'))
+```
+Result: `nav.main-menu, nav.mobile-menu[data-mobile="true"]`
+
+**Form Field Selectors:**
+```sql
+SELECT * FROM DOM WHERE
+TAG = 'input' AND (ATTR('type') = 'text' OR (ATTR('type') = 'email' AND CLASS = 'validated'))
+```
+Result: `input[type="text"], input[type="email"].validated`
+
+## Limitations
+
+While nested grouping is now supported, some complex cross-product operations may still have limitations:
+
+### Complex Cross-Products
+Very complex expressions involving multiple cross-products may not generate all possible combinations:
+
+```sql
+-- This may not produce all 4 combinations in some cases
+SELECT * FROM DOM WHERE
+(TAG = 'button' OR TAG = 'input') AND (CLASS = 'primary' OR CLASS = 'secondary')
+```
+
+In such cases, consider breaking the query into multiple simpler expressions.

@@ -7,7 +7,7 @@ sidebar_position: 9999
 JellySQL has some limitations that you should be aware of when using it. These limitations aren't due to any technological constraints, but rather that it has not yet been implemented.
 
 - **Complex Combinators**: There are cases where completely valid CSS combinator selectors may not be supported by Jelly SQL. For more information, see the [combinator limitation](./selectors/combinators.md#limitations) section.
-- **Grouping Expressions**: Only shallow grouping is supported. For more information, see the [grouping expressions limitation](./syntax/logical-grouping.md#limitations) section.
+- **Grouping Expressions**: Nested groupings are now supported. Some minor limitations still apply. For more information, see the [grouping expressions limitation](./syntax/logical-grouping.md#limitations) section.
 - **Namespaces**: Jelly SQL does not yet support namespaces as defined in the W3C specification. This is planned for a future release. For more information, see below from the W3C specification:
     - [Type selectors and namespaces](https://www.w3.org/TR/selectors-3/#typenmsp)
     - [Universal selectors and namespaces](https://www.w3.org/TR/selectors-3/#univnmsp)

@@ -113,7 +113,7 @@ function buildExpressions(tokens: Token[]): QueryToken[] {
                     compoundExpression = null;
 
                     /* Artificial Braces/Compound - Add brace for next compound */
-                    if (_tokens.length > 0 && _tokens[1].Value !== SymbolType.LPAREN) {
+                    if (_tokens.length > 1 && _tokens[1].Value !== SymbolType.LPAREN) {
                         _tokens.splice(1, 0, { Type: TokenType.SYMBOL, Value: SymbolType.LPAREN });
                         isArtificialCompound = true;
                     }
